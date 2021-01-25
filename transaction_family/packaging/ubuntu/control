@@ -1,0 +1,11 @@
+Source: sawtooth-autavail-tp-go
+Maintainer: GTA
+Section: go
+Priority: optional
+Standards-Version: 0.0
+Homepage: https://github.com/hyperledger/sawtooth-core
+Package: sawtooth-autavail-tp-go
+Architecture: all
+Depends: libssl-dev, libzmq3-dev
+Description: Sawtooth Autavail TP Go
+Version: @VERSION@
