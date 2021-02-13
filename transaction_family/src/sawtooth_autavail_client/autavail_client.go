@@ -6,7 +6,7 @@ import (
   "encoding/hex"
   "errors"
   "fmt"
-  cbor "github.com/brianolson/cbor_go"
+  // cbor "github.com/brianolson/cbor_go"
   "github.com/golang/protobuf/proto"
   "github.com/hyperledger/sawtooth-sdk-go/signing"
   "gopkg.in/yaml.v2"
@@ -196,7 +196,7 @@ func (autavailClient AutavailClient) sendRequest(
   apiSuffix string, // state?address=d7ad2c
   data []byte,
   contentType string,
-  name string) (string, error) {
+  txid string) (string, error) {
 
   // Construct URL (http://sawtooth-rest-api-default-0:8008/state?address=d7ad2c)
   var url string
@@ -220,7 +220,7 @@ func (autavailClient AutavailClient) sendRequest(
   }
   if response.StatusCode == 404 {
     logger.Debug(fmt.Sprintf("%v", response))
-    return "", errors.New(fmt.Sprintf("No such key: %s", name))
+    return "", errors.New(fmt.Sprintf("No such transaction: %s", txid))
   } else if response.StatusCode >= 400 {
     return "", errors.New(
       fmt.Sprintf("Error %d: %s", response.StatusCode, response.Status))
@@ -233,7 +233,84 @@ func (autavailClient AutavailClient) sendRequest(
   return string(reponseBody), nil
 }
 
-// d7ad2c 
+// Encode payload, build transaction, wrap transaction in bacth, send batch, return HTTP response and error
+func (autavailClient AutavailClient) sendTransaction(
+				txtype string, txid string, adverttxid string, price string, ipaddr string, orgid string, title string, description string, datatype string) (string, error) {
+
+	// Payload: <txtype>:<txid>:<adverttxid>:<price>:<ipaddr>:<orgid>:<title>:<description>:<datatype>
+	payloadData := fmt.Sprintf("%s:%s:%s:%s:%s:%s:%s:%s:%s",
+									txtype,
+									txid,
+									adverttxid,
+									price,
+									ipaddr,
+									orgid,
+									title,
+									description,
+									datatype)
+
+	// Construct the 70 characters hex encoded transaction address string
+	address := autavailClient.getAddress(txid)
+
+	// Construct the TransactionHeader
+	rawTransactionheader := transaction_pb2.TransactionHeader{
+				SignerPublicKey:			autavailClient.signer.GetPublicKey().AsHex(),
+				FamilyName:						FAMILY_NAME,
+				FamilyVersion:				FAMILY_VERSION,
+				Dependencies:					[]string{},
+				Nonce:								strconv.Itoa(rand.Int()),
+				BatcherPublicKey:			autavailClient.signer.GetPublicKey().AsHex(),
+				Inputs:								[]string{address}
+				Outputs:							[]string{address},
+				PayloadSha512:				Sha512HashValue(string(payload)),
+	}
+
+	// Serialize (marshall) in protocol buffer (Google protobuf)
+	transactionHeader, err := proto.Marshal(&rawTransactionHeader)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Unable to serialize transaction header: %v", err))
+	}
+
+	// Signature of transaction header
+	transactionHeaderSignature := hex.EncodeToString(
+					autavailClient.signer.Sign(transactionHeader))
+
+	// Construct transaction
+	transaction  := transaction_pb2.Transaction{
+		Header:						transactionHeader,
+		HeaderSignature:	transactionHeaderSignature,
+		Payload:					[]byte(payload),
+	}
+
+	// Get a BatchList
+	rawBatchList, err := autavailClient.createBatchList(
+					[]*transaction_pb2.Transaction{&transaction})
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Unable to construct batch list: %v", err))
+	}
+
+	// Serialize batch list
+	batchId := rawBatchList.Batches[0].HeaderSignature
+	batchList, err := proto.Marshal(&rawBatchList)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Unable to serialize batch list: %v", err))
+	}
+
+	// Send transaction in a batch
+	return autavailClient.sendRequest(BATCH_SUBMIT_API, batchList, CONTENT_TYPE_OCTET_STREAM, txid)
+}
+
+// Prefix = 6 first characters of hex encoding of SHA512 of "autavail" = d7ad2c
 func (autavailClient AutavailClient) getPrefix() string {
   return Sha512HashValue(FAMILY_NAME)[:FAMILY_NAMESPACE_ADDRESS_LENGTH]
+}
+
+/*
+	txidAddress = 64 last characters of hex encoding of SHA512 of "autavail"
+	address = <prefix><txidAddress>
+*/
+func (autavailClient AutavailClient) getAddress(txid string) string {
+	prefix := autavailClient.getPrefix()
+	txidAddress := Sha512HashValue(txid)[FAMILY_VERB_ADDRESS_LENGTH:]
+	return prefix + txidAddress
 }
