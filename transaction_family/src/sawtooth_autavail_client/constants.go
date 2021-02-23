@@ -5,7 +5,7 @@ const (
 	FAMILY_NAME       string = "autavail"
 	FAMILY_VERSION    string = "0.0"
 	DISTRIBUTION_NAME string = "sawtooth-autavail"
-	DEFAULT_URL       string = "http://sawtooth-rest-api-default-0:8008"
+	DEFAULT_URL       string = "http://localhost:8008"
 	// Verbs
 	VERB_ADVERT string = "advert"
 	VERB_BUY string = "buy"

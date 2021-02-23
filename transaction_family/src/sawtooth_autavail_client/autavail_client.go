@@ -297,6 +297,7 @@ func (autavailClient AutavailClient) sendTransaction(
 	}
 
 	// Send transaction in a batch
+	// Instead of sending, it's also possible to append it into a file and send the file
 	return autavailClient.sendRequest(BATCH_SUBMIT_API, batchList, CONTENT_TYPE_OCTET_STREAM, txid)
 }
 
@@ -313,4 +314,43 @@ func (autavailClient AutavailClient) getAddress(txid string) string {
 	prefix := autavailClient.getPrefix()
 	txidAddress := Sha512HashValue(txid)[FAMILY_VERB_ADDRESS_LENGTH:]
 	return prefix + txidAddress
+}
+
+/*
+	Get a list of transactions and wrapps than into a batch
+	Collect the batch into a batch list
+*/
+func (autavailClient AutavailClient) createBatchList(
+				transactions []*transaction_pb2.Transaction) (batch_pb2.BatchList, error) {
+
+	// Get list of TransactionHeader signatures
+	transactionSignatures := []string{}
+	for _, transaction := range transactions {
+		transactionSignatures = append(transactionSignatures, transaction.HeaderSignature)
+	}
+
+	// Construct BatchHeader
+	rawBatchHeader := batch_pb2.BatchHeader{
+		SignerPublicKey: autavailClient.signer.GetPublicKey().AsHex(),
+		TransactionIds:  transactionSignatures,
+	}
+	batchHeader, err := proto.Marshal(rawBatchHeader)
+	if err != nil {
+		return batch_pb2.BatchList{}, errors.New(fmt.Sprintf("Unable to serialize batch header: %v", err))
+	}
+
+	// Signature of batch header
+	batchHeaderSignature := hex.EncodeToString(autavailClient.signer.Sign(batchHeader))
+
+	//Construct batch
+	batch := batch_pb2.Batch{
+		Header:						batchHeader,
+		Transactions:			transactions,
+		HeaderSignature:	batchHeaderSignatures,
+	}
+
+	// Construct BatchList
+	return batch_pb2.BatchList{
+		Batches: []*batch_pb2.Batch{&batch}
+	}, nil
 }
