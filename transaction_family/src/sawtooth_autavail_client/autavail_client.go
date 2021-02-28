@@ -17,7 +17,7 @@ import (
   "protobuf/transaction_pb2"
   "strconv"
   "strings"
-  "time"
+	"os"
 )
 
 type AutavailClient struct {
@@ -35,7 +35,7 @@ func NewAutavailClient(url string, keyfile string) (IntkeyClient, error) {
 
   var privateKey signing.PrivateKey
 
-  // keyfile = ~/.sawtooth/keys/$USER.priv by default (--key-file option is disabled)
+  // keyfile = ~/.sawtooth/keys/$USER.priv by default
   if keyfile != "" {
     // Read private key file
     privateKeyStr, err := ioutil.ReadFile(keyfile)
@@ -61,7 +61,7 @@ func NewAutavailClient(url string, keyfile string) (IntkeyClient, error) {
   cryptoFactory := signing.NewCryptoFactory(context)
   signer := cryptoFactory.NewSigner(privateKey)
 
-	// url = http://sawtooth-rest-api-default-0:8008
+	// url = http://localhost:8008 by default
   return AutavailClient{url, signer}, nil
 }
 
@@ -170,35 +170,14 @@ func (autavailClient AutavailClient) List() ([]string, error) {
   return toReturn, nil
 }
 
-// Return a string that gives informations about a batch
-func (autavilClient AutavailClient) getStatus(
-  batchId string, wait uint) (string, error) {
-
-  apiSuffix := fmt.Sprintf("%s?id=%s&wait=%d",
-    BATCH_STATUS_API, batchId, wait)
-  response, err := autavailClient.sendRequest(apiSuffix, []byte{}, "", "")
-  if err != nil {
-    return "", err
-  }
-
-  responseMap := make(map[interface{}]interface{})
-  err = yaml.Unmarshal([]byte(response), &responseMap)
-  if err != nil {
-    return "", errors.New(fmt.Sprintf("Error reading response: %v", err))
-  }
-  entry :=
-    responseMap["data"].([]interface{})[0].(map[interface{}]interface{})
-  return fmt.Sprint(entry["status"]), nil
-}
-
 // Makes a HTTP request to the validator throw the REST API and returns response body
 func (autavailClient AutavailClient) sendRequest(
-  apiSuffix string, // state?address=d7ad2c
-  data []byte,
-  contentType string,
+  apiSuffix string,   // state?address=d7ad2c
+  data []byte,        // Data to POST. If empty, GET method will be applied
+  contentType string, // application/octet-stream in case of transactions 
   txid string) (string, error) {
 
-  // Construct URL (http://sawtooth-rest-api-default-0:8008/state?address=d7ad2c)
+  // Construct URL (http://localhost:8008/state?address=d7ad2c)
   var url string
   if strings.HasPrefix(autavailClient.url, "http://") {
     url = fmt.Sprintf("%s/%s", autavailClient.url, apiSuffix)
@@ -235,37 +214,45 @@ func (autavailClient AutavailClient) sendRequest(
 
 // Encode payload, build transaction, wrap transaction in bacth, send batch, return HTTP response and error
 func (autavailClient AutavailClient) sendTransaction(
-				txtype string, txid string, adverttxid string, price string, ipaddr string, orgid string, title string, description string, datatype string) (string, error) {
+	txtype string,
+	txid string,
+	adverttxid string,
+	price string,
+	ipaddr string,
+	orgid string,
+	title string,
+	description string,
+	datatype string) (string, error) {
 
 	// Payload: <txtype>:<txid>:<adverttxid>:<price>:<ipaddr>:<orgid>:<title>:<description>:<datatype>
-	payloadData := fmt.Sprintf("%s:%s:%s:%s:%s:%s:%s:%s:%s",
-									txtype,
-									txid,
-									adverttxid,
-									price,
-									ipaddr,
-									orgid,
-									title,
-									description,
-									datatype)
+	payload := fmt.Sprintf("%s:%s:%s:%s:%s:%s:%s:%s:%s",
+	txtype,
+	txid,
+	adverttxid,
+	price,
+	ipaddr,
+	orgid,
+	title,
+	description,
+	datatype)
 
 	// Construct the 70 characters hex encoded transaction address string
 	address := autavailClient.getAddress(txid)
 
 	// Construct the TransactionHeader
 	rawTransactionheader := transaction_pb2.TransactionHeader{
-				SignerPublicKey:			autavailClient.signer.GetPublicKey().AsHex(),
-				FamilyName:						FAMILY_NAME,
-				FamilyVersion:				FAMILY_VERSION,
-				Dependencies:					[]string{},
-				Nonce:								strconv.Itoa(rand.Int()),
-				BatcherPublicKey:			autavailClient.signer.GetPublicKey().AsHex(),
-				Inputs:								[]string{address}
-				Outputs:							[]string{address},
-				PayloadSha512:				Sha512HashValue(string(payload)),
+				SignerPublicKey:   autavailClient.signer.GetPublicKey().AsHex(),
+				FamilyName:        FAMILY_NAME,
+				FamilyVersion:     FAMILY_VERSION,
+				Dependencies:      []string{},
+				Nonce:             strconv.Itoa(rand.Int()),
+				BatcherPublicKey:  autavailClient.signer.GetPublicKey().AsHex(),
+				Inputs:            []string{address}
+				Outputs:           []string{address},
+				PayloadSha512:     Sha512HashValue(string(payload)),
 	}
 
-	// Serialize (marshall) in protocol buffer (Google protobuf)
+	// Serialize (marshall) in protocol buffer (Google Protobuf)
 	transactionHeader, err := proto.Marshal(&rawTransactionHeader)
 	if err != nil {
 		return "", errors.New(fmt.Sprintf("Unable to serialize transaction header: %v", err))
@@ -277,12 +264,12 @@ func (autavailClient AutavailClient) sendTransaction(
 
 	// Construct transaction
 	transaction  := transaction_pb2.Transaction{
-		Header:						transactionHeader,
-		HeaderSignature:	transactionHeaderSignature,
-		Payload:					[]byte(payload),
+		Header:           transactionHeader,
+		HeaderSignature:  transactionHeaderSignature,
+		Payload:          []byte(payload),
 	}
 
-	// Get a BatchList
+	// Get BatchList
 	rawBatchList, err := autavailClient.createBatchList(
 					[]*transaction_pb2.Transaction{&transaction})
 	if err != nil {
@@ -296,8 +283,22 @@ func (autavailClient AutavailClient) sendTransaction(
 		return "", errors.New(fmt.Sprintf("Unable to serialize batch list: %v", err))
 	}
 
-	// Send transaction in a batch
-	// Instead of sending, it's also possible to append it into a file and send the file
+	// If url is "file", append batch list in file named "autavail.workload"
+	if autavailClient.url == "file" {
+		fileDescriptor, err := os.OpenFile("autavail.workload", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			return "", errors.New(fmt.Sprintf("Unable to open file: %v", err))
+    }
+		if _, err := f.Write(batchList); err != nil {
+			return "", errors.New(fmt.Sprintf("Unable to write into file: %v", err))
+    }
+		if err := f.Close(); err != nil {
+			return "", errors.New(fmt.Sprintf("Unable to close file: %v", err))
+    }
+		return "Write into autavail.workload file", nil
+	}
+
+	// Submmit batch list throw HTTP
 	return autavailClient.sendRequest(BATCH_SUBMIT_API, batchList, CONTENT_TYPE_OCTET_STREAM, txid)
 }
 
@@ -344,9 +345,9 @@ func (autavailClient AutavailClient) createBatchList(
 
 	//Construct batch
 	batch := batch_pb2.Batch{
-		Header:						batchHeader,
-		Transactions:			transactions,
-		HeaderSignature:	batchHeaderSignatures,
+		Header:          batchHeader,
+		Transactions:    transactions,
+		HeaderSignature: batchHeaderSignatures,
 	}
 
 	// Construct BatchList
