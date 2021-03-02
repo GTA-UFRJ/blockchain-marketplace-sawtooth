@@ -170,6 +170,18 @@ func (autavailClient AutavailClient) List() ([]string, error) {
   return toReturn, nil
 }
 
+func (autavailClient AutavailClient) Register(
+  txtype string, orgid string) (string, error) {
+	txid := ""
+	adverttxid := ""
+  price := ""
+	ipaddr := ""
+  title := ""
+  description := ""
+  datatype := ""
+  return autavailClient.sendTransaction(txtype, txid, adverttxid, price, ipaddr, orgid, title, description, datatype)
+}
+
 // Makes a HTTP request to the validator throw the REST API and returns response body
 func (autavailClient AutavailClient) sendRequest(
   apiSuffix string,   // state?address=d7ad2c

@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/jessevdk/go-flags"
-	"strconv"
 	"crypto/rand"
 	"crypto/sha512"
 	"encoding/hex"
