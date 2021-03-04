@@ -343,8 +343,11 @@ func (autavailClient AutavailClient) getAddress(
 		// Address where advert transaction will be stored 
 		advertAddress := prefix + Sha512HashValue(txid)[FAMILY_VERB_ADDRESS_LENGTH:]
 
-		// TP will read to validate if the transacation alredy exists
-		inputAddresses := []string{advertAddress}
+		// Address where seller organization balance is stored
+		advertOrgAddress := prefix + Sha512HashValue(orgid)[FAMILY_VERB_ADDRESS_LENGTH:]
+
+		// TP will read to validate if the transacation and the organization alredy exists
+		inputAddresses := []string{advertAddress, advertOrgAddress}
 
 		// TP will write the transaction
 		outputAddresses := []string{advertAddress}
@@ -366,7 +369,7 @@ func (autavailClient AutavailClient) getAddress(
 		// TP will read to validate the buyer and seller balances and the buy and advert transactions existance
 		inputAddresses := []string{buyAddress, buyOrgAddress, advertAddress, advertOrgAddress}
 
-		// TP will write to the balces and apply the buy transactions
+		// TP will write to the balances and apply the buy transactions
 		inputAddresses := []string{buyAddress, buyOrgAddress, advertOrgAddress}
 		break;
 
