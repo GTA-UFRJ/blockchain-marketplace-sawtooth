@@ -3,7 +3,7 @@ package main
 const (
 	// String literals
 	FAMILY_NAME                     string = "autavail"
-	FAMILY_VERSION                  string = "0.0"
+	FAMILY_VERSION                  string = "1.0"
 	DEFAULT_URL                     string = "http://localhost:8008"
 	BATCH_SUBMIT_API                string = "batches"
 	BATCH_STATUS_API                string = "batch_statuses"

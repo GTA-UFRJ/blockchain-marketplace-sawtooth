@@ -259,7 +259,7 @@ func (autavailClient AutavailClient) sendTransaction(
 				Dependencies:      []string{},
 				Nonce:             strconv.Itoa(rand.Int()),
 				BatcherPublicKey:  autavailClient.signer.GetPublicKey().AsHex(),
-				Inputs:            []string{address}
+				Inputs:            []string{address},
 				Outputs:           []string{address},
 				PayloadSha512:     Sha512HashValue(string(payload)),
 	}

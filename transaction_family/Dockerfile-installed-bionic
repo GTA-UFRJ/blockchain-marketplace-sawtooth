@@ -97,11 +97,13 @@ RUN pkg=autavail_go \
 
 FROM ubuntu:bionic
 
-RUN apt-get update \
+RUN mkdir /binary \
+ && apt-get update \
  && apt-get install -y \
  systemd
 
 COPY --from=autavail-tp-go-builder /go/src/github.com/hyperledger/sawtooth-sdk-go/examples/autavail_go/sawtooth-autavail-tp-go_*.deb /tmp
+COPY --from=autavail-tp-go-builder /go/src/github.com/hyperledger/sawtooth-sdk-go/examples/autavail_go/bin/autavail-go /binary
 
 RUN apt-get update \
  && dpkg -i /tmp/sawtooth-*.deb || true \

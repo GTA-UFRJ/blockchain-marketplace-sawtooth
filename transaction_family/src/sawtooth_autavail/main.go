@@ -1,20 +1,3 @@
-/**
- * Copyright 2017 Intel Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * ------------------------------------------------------------------------------
- */
-
 package main
 
 import (
@@ -27,6 +10,7 @@ import (
 	"syscall"
 )
 
+// CLI options when starting processor. First time configurations
 type Opts struct {
 	Verbose []bool `short:"v" long:"verbose" description:"Increase verbosity"`
 	Connect string `short:"C" long:"connect" description:"Validator component endpoint to connect to" default:"tcp://localhost:4004"`
@@ -37,8 +21,10 @@ type Opts struct {
 func main() {
 	var opts Opts
 
+	// Access logger
 	logger := logging.Get()
 
+	// Parser CLI options
 	parser := flags.NewParser(&opts, flags.Default)
 	remaining, err := parser.Parse()
 	if err != nil {
@@ -49,14 +35,13 @@ func main() {
 			os.Exit(2)
 		}
 	}
-
 	if len(remaining) > 0 {
 		fmt.Printf("Error: Unrecognized arguments passed: %v\n", remaining)
 		os.Exit(2)
 	}
-
 	endpoint := opts.Connect
 
+	// Set log verbosity level
 	switch len(opts.Verbose) {
 	case 2:
 		logger.SetLevel(logging.DEBUG)
@@ -66,8 +51,11 @@ func main() {
 		logger.SetLevel(logging.WARN)
 	}
 
-	prefix := intkey.Hexdigest("autavail")[:6]
-	handler := intkey.NewIntkeyHandler(prefix)
+	// Creates handler class (application specific)
+	prefix := autavail.Hexdigest("autavail")[:6]
+	handler := autavail.NewAutAvailHandler(prefix)
+
+	// Creates processor class (SDK general-purpose)
 	processor := processor.NewTransactionProcessor(endpoint)
 	processor.SetMaxQueueSize(opts.Queue)
 	if opts.Threads > 0 {
@@ -75,6 +63,8 @@ func main() {
 	}
 	processor.AddHandler(handler)
 	processor.ShutdownOnSignal(syscall.SIGINT, syscall.SIGTERM)
+
+	// Entry point
 	err = processor.Start()
 	if err != nil {
 		logger.Error("Processor stopped: ", err)
