@@ -10,9 +10,10 @@ import (
 // autavail buy --url http://rest-api:8008 --keyfile ./bar.priv 75dbc3d5dd58a35bf 10.15.134.89 119131225 
 type Buy struct {
 	Args struct {
-		AdvertTxId string `positional-arg-name:"adverttxid" required:"true" description:"Identification number of advertisement transaction"`
-		IpAddr     string `positional-arg-name:"ip" required:"true" description:"Client IP address"`
-		OrgId      string `positional-arg-name:"orgid" required:"true" description:"Identification number of organization"`
+		AdvertTxId  string `positional-arg-name:"adverttxid" required:"true" description:"Identification number of advertisement transaction"`
+		AdvertOrgId string `positional-arg-name:"advertorgid" required:"true" description:"Organizatio ID of advertisement transaction"`
+		IpAddr      string `positional-arg-name:"ip" required:"true" description:"Client IP address"`
+		OrgId       string `positional-arg-name:"orgid" required:"true" description:"Identification number of organization"`
 	} `positional-args:"true"`
 	Url     string `long:"url" description:"Specify URL of REST API"`
 	Keyfile string `long:"keyfile" description:"Identify file containing user's private key"`
@@ -54,7 +55,8 @@ func (args *Buy) Run() error {
 	// Collect data to construct payload
 	txtype := args.Name()
 	txid := args.TxId()
-	adverttxid = args.Args.AdvertTxId
+	adverttxid := args.Args.AdvertTxId
+	advertorgid := args.Args.AdvertOrgId
 	ipaddr := args.Args.IpAddr
 	orgid := args.Args.OrgId
 
@@ -65,6 +67,6 @@ func (args *Buy) Run() error {
 	}
 
 	// Call function in the program to submitt transactions (autavail_client.go)
-	_, err = autavailClient.Buy(txtype, txid, adverttxid, ipaddr, orgid)
+	_, err = autavailClient.Buy(txtype, txid, adverttxid, advertorgid, ipaddr, orgid)
 	return err
 }

@@ -74,16 +74,17 @@ func NewAutavailClient(url string, keyfile string) (IntkeyClient, error) {
 func (autavailClient AutavailClient) Advert(
   txtype string, txid string, price string, ipaddr string, orgid string, title string, description string, datatype string) (string, error) {
   adverttxid := ""
-  return autavailClient.sendTransaction(txtype, txid, adverttxid, price, ipaddr, orgid, title, description, datatype)
+	advertorgid := ""
+  return autavailClient.sendTransaction(txtype, txid, adverttxid, advertorgid, price, ipaddr, orgid, title, description, datatype)
 }
 
 func (autavailClient AutavailClient) Buy(
-  txtype string, txid string, adverttxid string, ipaddr string, orgid string) (string, error) {
+  txtype string, txid string, adverttxid string, advertorgid string, ipaddr string, orgid string) (string, error) {
   price := ""
   title := ""
   description := ""
   datatype := ""
-  return autavailClient.sendTransaction(txtype, txid, adverttxid, price, ipaddr, orgid, title, description, datatype)
+  return autavailClient.sendTransaction(txtype, txid, adverttxid, advertorgid, price, ipaddr, orgid, title, description, datatype)
 }
 
 /*
@@ -174,12 +175,13 @@ func (autavailClient AutavailClient) Register(
   txtype string, orgid string) (string, error) {
 	txid := ""
 	adverttxid := ""
+	advertorgid := ""
   price := ""
 	ipaddr := ""
   title := ""
   description := ""
   datatype := ""
-  return autavailClient.sendTransaction(txtype, txid, adverttxid, price, ipaddr, orgid, title, description, datatype)
+  return autavailClient.sendTransaction(txtype, txid, adverttxid, advertorgid, price, ipaddr, orgid, title, description, datatype)
 }
 
 // Makes a HTTP request to the validator throw the REST API and returns response body
@@ -229,6 +231,7 @@ func (autavailClient AutavailClient) sendTransaction(
 	txtype string,
 	txid string,
 	adverttxid string,
+	advertorgid string,
 	price string,
 	ipaddr string,
 	orgid string,
@@ -237,10 +240,11 @@ func (autavailClient AutavailClient) sendTransaction(
 	datatype string) (string, error) {
 
 	// Payload: <txtype>:<txid>:<adverttxid>:<price>:<ipaddr>:<orgid>:<title>:<description>:<datatype>
-	payload := fmt.Sprintf("%s:%s:%s:%s:%s:%s:%s:%s:%s",
+	payload := fmt.Sprintf("%s:%s:%s:%s:%s:%s:%s:%s:%s:%s",
 	txtype,
 	txid,
 	adverttxid,
+	advertorgid,
 	price,
 	ipaddr,
 	orgid,
@@ -249,7 +253,7 @@ func (autavailClient AutavailClient) sendTransaction(
 	datatype)
 
 	// Construct the 70 characters hex encoded transaction address string
-	address := autavailClient.getAddress(txid)
+	inputAdresses, outputAdresses := autavailClient.getAddress(txtype, txid, adverttxid, orgid, advertorgid)
 
 	// Construct the TransactionHeader
 	rawTransactionheader := transaction_pb2.TransactionHeader{
@@ -259,8 +263,8 @@ func (autavailClient AutavailClient) sendTransaction(
 				Dependencies:      []string{},
 				Nonce:             strconv.Itoa(rand.Int()),
 				BatcherPublicKey:  autavailClient.signer.GetPublicKey().AsHex(),
-				Inputs:            []string{address},
-				Outputs:           []string{address},
+				Inputs:            inputAdresses,
+				Outputs:           outputAdresses,
 				PayloadSha512:     Sha512HashValue(string(payload)),
 	}
 
@@ -320,13 +324,64 @@ func (autavailClient AutavailClient) getPrefix() string {
 }
 
 /*
-	txidAddress = 64 last characters of hex encoding of SHA512 of "autavail"
-	address = <prefix><txidAddress>
+ Addresses determine where TP (transaction processor) are allowed to read from (inputs) or write to (outputs) the state
+
+    address = prefix + 64 characters of SHA512 of something
+       |        |                       |
+     state  TF specific     Depends on the transaction
 */
-func (autavailClient AutavailClient) getAddress(txid string) string {
+func (autavailClient AutavailClient) getAddress(
+	txtype string,
+	txid string,
+	adverttxid string,
+	orgid string,
+	advertorgid string) ([]string, []string) {
+
 	prefix := autavailClient.getPrefix()
-	txidAddress := Sha512HashValue(txid)[FAMILY_VERB_ADDRESS_LENGTH:]
-	return prefix + txidAddress
+	switch (txtype) {
+		case "advert":
+		// Address where advert transaction will be stored 
+		advertAddress := prefix + Sha512HashValue(txid)[FAMILY_VERB_ADDRESS_LENGTH:]
+
+		// TP will read to validate if the transacation alredy exists
+		inputAddresses := []string{advertAddress}
+
+		// TP will write the transaction
+		outputAddresses := []string{advertAddress}
+		break;
+
+		case "buy":
+		// Address where buy transaction will be stored 
+		buyAddress := prefix + Sha512HashValue(txid)[FAMILY_VERB_ADDRESS_LENGTH:]
+
+		// Address where correspondent advert transaction is stored
+		advertAddress := prefix + Sha512HashValue(adverttxid)[FAMILY_VERB_ADDRESS_LENGTH:]
+
+		// Address where buyer organization balance is stored
+		buyOrgAddress := prefix + Sha512HashValue(orgid)[FAMILY_VERB_ADDRESS_LENGTH:]
+
+		// Address where seller organization balance is stored
+		advertOrgAddress := prefix + Sha512HashValue(advertorgid)[FAMILY_VERB_ADDRESS_LENGTH:]
+
+		// TP will read to validate the buyer and seller balances and the buy and advert transactions existance
+		inputAddresses := []string{buyAddress, buyOrgAddress, advertAddress, advertOrgAddress}
+
+		// TP will write to the balces and apply the buy transactions
+		inputAddresses := []string{buyAddress, buyOrgAddress, advertOrgAddress}
+		break;
+
+		case "register":
+		// Address where organization balance will be stored
+		orgAddress := prefix + Sha512HashValue(orgid)[FAMILY_VERB_ADDRESS_LENGTH:]
+
+		// TP will read to validate if the organization is alredy registred
+		inputAddresses := []string{orgAddress}
+
+		// TP will write to register the organization
+		inputAddresses := []string{orgAddress}
+		break;
+	}
+	return inputAddresses, outputAddresses
 }
 
 /*
