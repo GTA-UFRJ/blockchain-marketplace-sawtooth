@@ -74,7 +74,26 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
 
 	// Verify transaction type
 	switch txType {
+
+		// ------------------------- ADVERTISEMENT -------------------------
+
 		case ADVERT_TYPE:
+
+		// Validate advertisement transaction
+		if (len(txID) != TXID_LENGTH)     ||
+		   (len(advertisementTxID) != 0)  ||
+		   (len(advertisementOrgID) != 0) ||
+			 (len(price) == 0)              ||
+			 (len(ipAddress) == 0)          ||
+			 (len(orgID) == 0)              ||
+			 (len(title) == 0)              ||
+			 (len(description) == 0)        ||
+			 (len(dataType) == 0) {
+			return &processor.InvalidTransactionError{Msg: "Missing fields: %s", payload}
+		}
+	  if floatPrice, err := strconv.ParseFloat(price,32); err != nil {
+			return &processor.InvalidTransactionError{Msg: "Price is not a valid float: %s. Error converting: %v", price, err}
+		}
 
 		// Get state addresses
 		hashedTxID := Hexdigest(txID)
@@ -95,23 +114,6 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
 			return &processor.InvalidTransactionError{Msg: "Organization %s not registred", orgID}
 		}
 
-		// Validate advertisement transaction
-		if (len(txID) != TXID_LENGTH)     ||
-		   (len(advertisementTxID) != 0)  ||
-		   (len(advertisementOrgID) != 0) ||
-		   (len(advertisementTxID) != 0)  ||
-			 (len(price) == 0)              ||
-			 (len(ipAddress) == 0)          ||
-			 (len(orgID) == 0)              ||
-			 (len(title) == 0)              ||
-			 (len(description) == 0)        ||
-			 (len(dataType) == 0) {
-			return &processor.InvalidTransactionError{Msg: "Missing fields: %s", payload}
-		}
-	  if floatPrice, err := strconv.ParseFloat(price,32); err != nil {
-			return &processor.InvalidTransactionError{Msg: "Price is not a valid float: %s. Error converting: %v", price, err}
-		}
-
 		// Construct state advert string
 		advertStateData := fmt.Sprintf("%s:%s:%s:%s:%s:%s:%s",
 		txID,
@@ -123,10 +125,8 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
 		dataType)
 
 		// Apply advertisement transaction
-		address := advertAddress
-		data := advertStateData,
 		adresses, err := context.SetState(map[string][]byte{
-			address: data,
+			advertAddress: []byte(advertStateData),
 		})
 		if err != nil {
 			return err
@@ -136,11 +136,106 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
 		}
 		break;
 
+		// ------------------------- BUY -------------------------
+
 		case BUY_TYPE:
-		// Get state address
-		// Validate advertisement transaction
-		// Apply advertisement transaction
+
+		// Validate buy transaction
+		if (len(txID) != TXID_LENGTH)              ||
+		   (len(advertisementTxID) != TXID_LENGTH) ||
+		   (len(advertisementOrgID) == 0)          ||
+			 (len(price) != 0)                       ||
+			 (len(ipAddress) == 0)                   ||
+			 (len(orgID) == 0)                       ||
+			 (len(title) != 0)                       ||
+			 (len(description) != 0)                 ||
+			 (len(dataType) != 0) {
+			return &processor.InvalidTransactionError{Msg: "Missing fields: %s", payload}
+		}
+
+		// Get state addresses
+		hashedTxID := Hexdigest(txID)
+		buyAddress := self.namespace + hashedTxID[len(hashedTxID)-VERB_ADDRESS_LENGTH:]
+		hashedAdvertTxId := Hexdigest(advertisementTxID)
+		advertAddress := self.namespace + hashedAdvertTxID[len(hashedAdvertTxID)-VERB_ADDRESS_LENGTH:]
+		hashedOrgID := Hexdigest(orgID)
+		buyOrgAddress := self.namespace + hashedOrgID[len(hashedOrgID)-VERB_ADDRESS_LENGTH:]
+		hashedAdvertOrgID := Hexdigest(advertisementOrgID)
+		advertOrgAddress := self.namespace + hashedAdvertOrgID[len(hashedAdvertOrgID)-VERB_ADDRESS_LENGTH:]
+
+		// Get state information
+		stateQuery, err := context.GetState([]string{buyAddress, buyOrgAddress, advertAddress, advertOrgAddress})
+		if err != nil {
+			return err
+		}
+		if len(string(stateQuery[buyAddress])) > 0 {
+			return &processor.InvalidTransactionError{Msg: "Transaction %s alredy exists", txID}
+		}
+		advertTxData := string(stateQuery[advertAddress])
+		if len(advertTxData) == 0 {
+			return &processor.InvalidTransactionError{Msg: "Advertisement transaction %s does not exist", advertisementTxID}
+		}
+		buyOrgData := string(stateQuery[buyOrgAddress])
+		if len(buyOrgData) == 0 {
+			return &processor.InvalidTransactionError{Msg: "Organization %s not registred", orgID}
+		}
+		advertOrgData := string(stateQuery[advertOrgAddress])
+		if len(advertOrgData) == 0 {
+			return &processor.InvalidTransactionError{Msg: "Organization %s not registred", advertisementOrgID}
+		}
+
+		// Obtain informations about advertisement transaction
+		advertTxDataSplit := strings.Split(advertTxData)
+		if assetPrice, err := strconv.ParseFloat(advertTxDataSplit[1],32), err != nil {
+			return &processor.InternalError{Msg: "Error reading price: %s", advertTxDataSplit[1]}
+		}
+		if advertTxDataSplit[3] != advertisementOrgId {
+			return &processor.InvalidTransactionError{Msg: "Advertisement transaction was not sent from this organization: %s", advertTxData}
+		}
+
+		// Obtain balances
+		buyOrgDataSplit := strings.Split(buyOrgData,":")
+		if buyerBalance, err := strconv.ParseFloat(buyOrgDataSplit[1],32), err != nil {
+			return &processor.InternalError{Msg: "Error reading balance: %s", buyOrgDataSplit[1]}
+		}
+		advertOrgDataSplit := strings.Split(advertOrgData,":")
+		if sellerBalance, err := strconv.ParseFloat(advertOrgDataSplit[1],32), err != nil {
+			return &processor.InternalError{Msg: "Error reading balance: %s", advertOrgDataSplit[1]}
+		}
+
+		// Compute balances if payment is allowed
+		if buyerBalance >= assetPrice {
+			buyerBalance -= assetPrice
+			sellerBalance += assetPrice
+		}
+
+		// Construct state buy string
+		buyStateData := fmt.Sprintf("%s:%s:%s:%s:%s",
+		txID,
+		advertisementTxID,
+		advertisementOrgID,
+		ipAddress,
+		orgID)
+
+		// Construct state organizations string
+		buyOrgStateData := fmt.Sprintf("%s:%f", orgID, buyerBalance)
+		advertOrgStateData := fmt.Sprintf("%s:%f", advertisementOrgID, sellerBalance)
+
+		// Apply buy transaction
+		adresses, err := context.SetState(map[string][]byte{
+			buyAddress: []byte(buyStateData),
+			buyOrgAddress: []byte(buyOrgStateData),
+			buyAdvertAddress: []byte(buyAdvertStateData),
+		})
+		if err != nil {
+			return err
+		}
+		if len(addresses) == 0 {
+			return &processor.InternalError{Msg: "No addresses in set response"}
+		}
 		break;
+
+		// ------------------------- REGISTER -------------------------
 
 		case REGISTER_TYPE:
 		// Get state address

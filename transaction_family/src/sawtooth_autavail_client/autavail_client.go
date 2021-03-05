@@ -340,11 +340,13 @@ func (autavailClient AutavailClient) getAddress(
 	prefix := autavailClient.getPrefix()
 	switch (txtype) {
 		case "advert":
-		// Address where advert transaction will be stored 
-		advertAddress := prefix + Sha512HashValue(txid)[FAMILY_VERB_ADDRESS_LENGTH:]
+		// Address where advert transaction will be stored
+		hashedTxId := Sha512HashValue(txid)
+		advertAddress := prefix + hashedTxId[len(hashedTxId)-FAMILY_VERB_ADDRESS_LENGTH:]
 
 		// Address where seller organization balance is stored
-		advertOrgAddress := prefix + Sha512HashValue(orgid)[FAMILY_VERB_ADDRESS_LENGTH:]
+		hashedOrdId := Sha512HashValue(orgid)
+		advertOrgAddress := prefix + hashedOrdId[len(hashedOrdId)-FAMILY_VERB_ADDRESS_LENGTH:]
 
 		// TP will read to validate if the transacation and the organization alredy exists
 		inputAddresses := []string{advertAddress, advertOrgAddress}
@@ -355,16 +357,20 @@ func (autavailClient AutavailClient) getAddress(
 
 		case "buy":
 		// Address where buy transaction will be stored 
-		buyAddress := prefix + Sha512HashValue(txid)[FAMILY_VERB_ADDRESS_LENGTH:]
+		hashedTxId := Sha512HashValue(txid)
+		buyAddress := prefix + hashedTxId[len(hashedTxId)-FAMILY_VERB_ADDRESS_LENGTH:]
 
 		// Address where correspondent advert transaction is stored
-		advertAddress := prefix + Sha512HashValue(adverttxid)[FAMILY_VERB_ADDRESS_LENGTH:]
+		hashedAdvertTxId := Sha512HashValue(adverttxid)
+		advertAddress := prefix + hashedAdvertTxId[len(hashedAdvertTxId)-FAMILY_VERB_ADDRESS_LENGTH:]
 
 		// Address where buyer organization balance is stored
-		buyOrgAddress := prefix + Sha512HashValue(orgid)[FAMILY_VERB_ADDRESS_LENGTH:]
+		hashedOrgId := Sha512HashValue(orgid)
+		buyOrgAddress := prefix + hashedOrgId[len(hashedOrgId)-FAMILY_VERB_ADDRESS_LENGTH:]
 
 		// Address where seller organization balance is stored
-		advertOrgAddress := prefix + Sha512HashValue(advertorgid)[FAMILY_VERB_ADDRESS_LENGTH:]
+		hashedAdvertOrgId := Sha512HashValue(advertorgid)
+		advertOrgAddress := prefix + hashedAdvertOrgId[len(hashedAdvertOrgId)-FAMILY_VERB_ADDRESS_LENGTH:]
 
 		// TP will read to validate the buyer and seller balances and the buy and advert transactions existance
 		inputAddresses := []string{buyAddress, buyOrgAddress, advertAddress, advertOrgAddress}
@@ -375,7 +381,8 @@ func (autavailClient AutavailClient) getAddress(
 
 		case "register":
 		// Address where organization balance will be stored
-		orgAddress := prefix + Sha512HashValue(orgid)[FAMILY_VERB_ADDRESS_LENGTH:]
+		hashedOrgId := Sha512HashValue(orgid)
+		orgAddress := prefix + hashedOrgId[len(hashedOrgId)-FAMILY_VERB_ADDRESS_LENGTH:]
 
 		// TP will read to validate if the organization is alredy registred
 		inputAddresses := []string{orgAddress}
