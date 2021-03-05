@@ -48,9 +48,7 @@ RUN go get -u \
     golang.org/x/crypto/ssh \
     gopkg.in/yaml.v2
 
-COPY $GOPATH/src/github.com/hyperledger/sawtooth-sdk-go /go/src/github.com/hyperledger/sawtooth-sdk-go
-RUN if [ -f "/go/src/github.com/hyperledger/sawtooth-sdk-go/examples/autavail_go" ]; then rm -rf /go/src/github.com/hyperledger/sawtooth-sdk-go/examples/autavail_go; fi
-COPY . /go/src/github.com/hyperledger/sawtooth-sdk-go/examples/autavail_go 
+COPY . /go/src/github.com/hyperledger/sawtooth-sdk-go
 
 WORKDIR /go/src/github.com/hyperledger/sawtooth-sdk-go
 
