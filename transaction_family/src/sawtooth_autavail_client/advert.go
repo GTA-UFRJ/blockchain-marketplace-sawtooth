@@ -42,7 +42,7 @@ func (args *Advert) TxId () (string, error) {
 		return "", err
 	}
 	txid := sha512.Sum512(nonce)
-	return hex.EncodeToString(txid[0:TXID_LENGTH]), nil
+	return hex.EncodeToString(txid[0:(TXID_LENGTH/2)]), nil
 }
 
 // Apply AddCommand method to parser object

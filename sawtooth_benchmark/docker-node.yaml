@@ -3,7 +3,7 @@ version: "2.1"
 services:
 
   autavail-tp-go:
-    image: guilhermeeec/sawtooth-autavail-tp-go:firsttry
+    image: guilhermeeec/sawtooth-autavail-tp-go:3
     container_name: sawtooth-autavail-tp-go
     depends_on:
       - validator

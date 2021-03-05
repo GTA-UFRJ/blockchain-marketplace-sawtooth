@@ -66,8 +66,8 @@ func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, cont
 	//As we define the payload as a ":"-separated string, we split the payload to process the transaction
 	payload := string(payloadData)
 	payloadSplit := strings.Split(payload,":")
-	if len(payloadSplit) != 9 {
-		return &processor.InvalidTransactionError{Msg: fmt.Sprint("Malformed payload: %s", payload)}
+	if len(payloadSplit) != 10 {
+		return &processor.InvalidTransactionError{Msg: fmt.Sprint("Malformed payload: ", payload)}
 	}
 	txType := payloadSplit[0]
 	txID := payloadSplit[1]
@@ -97,10 +97,10 @@ func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, cont
 			 (len(title) == 0)              ||
 			 (len(description) == 0)        ||
 			 (len(dataType) == 0) {
-			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Incorrect fields: %s", payload)}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Incorrect fields: ", payload)}
 		}
 	  if _, err := strconv.ParseFloat(price,32); err != nil {
-			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Price is not a valid float: %s. Error converting: %v", price, err)}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Price is not a valid float: ", price, ". Error converting: ", err)}
 		}
 
 		// Get state addresses
@@ -115,11 +115,11 @@ func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, cont
 			return err
 		}
 		if len(string(stateQuery[advertAddress])) > 0 {
-			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Transaction %s alredy exists", txID)}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Transaction ", txID, " alredy exists")}
 		}
 		orgData := string(stateQuery[orgAddress])
 		if len(orgData) == 0 {
-			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Organization %s not registred", orgID)}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Organization ", orgID, " not registred")}
 		}
 
 		// Construct state advert string
@@ -158,7 +158,7 @@ func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, cont
 			 (len(title) != 0)                       ||
 			 (len(description) != 0)                 ||
 			 (len(dataType) != 0) {
-			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Incorrect fields: %s", payload)}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Incorrect fields: ", payload)}
 		}
 
 		// Get state addresses
@@ -177,19 +177,19 @@ func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, cont
 			return err
 		}
 		if len(string(stateQuery[buyAddress])) > 0 {
-			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Transaction %s alredy exists", txID)}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Transaction ", txID, " alredy exists")}
 		}
 		advertTxData := string(stateQuery[advertAddress])
 		if len(advertTxData) == 0 {
-			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Advertisement transaction %s does not exist", advertisementTxID)}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Advertisement transaction ", advertisementTxID, " does not exist")}
 		}
 		buyOrgData := string(stateQuery[buyOrgAddress])
 		if len(buyOrgData) == 0 {
-			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Organization %s not registred", orgID)}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Organization ", orgID, "  not registred")}
 		}
 		advertOrgData := string(stateQuery[advertOrgAddress])
 		if len(advertOrgData) == 0 {
-			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Organization %s not registred", advertisementOrgID)}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Organization ", advertisementOrgID, " not registred")}
 		}
 
 		// Obtain informations about advertisement transaction
@@ -197,7 +197,7 @@ func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, cont
 		assetPrice, _ := strconv.ParseFloat(advertTxDataSplit[1],32)
 		_ = assetPrice
 		if advertTxDataSplit[3] != advertisementOrgID {
-			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Advertisement transaction was not sent from this organization: %s", advertTxData)}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Advertisement transaction was not sent from this organization: ", advertTxData)}
 		}
 
 		// Obtain balances
@@ -211,7 +211,7 @@ func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, cont
 
 		// Compute balances if payment is allowed
 		if buyerBalance < assetPrice {
-			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Insuficient tokens: %f < %f", buyerBalance, assetPrice)}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Insuficient tokens: ", buyerBalance, " < ", assetPrice)}
 		}
 		buyerBalance -= assetPrice
 		sellerBalance += assetPrice
@@ -256,7 +256,7 @@ func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, cont
        (len(title) != 0)              ||
        (len(description) != 0)        ||
        (len(dataType) != 0) {
-      return &processor.InvalidTransactionError{Msg: fmt.Sprint("Incorrect fields: %s", payload)}
+      return &processor.InvalidTransactionError{Msg: fmt.Sprint("Incorrect fields: ", payload)}
     }
 
 		// Get state address
@@ -269,7 +269,7 @@ func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, cont
       return err
     }
     if len(string(stateQuery[orgAddress])) > 0 {
-      return &processor.InvalidTransactionError{Msg: fmt.Sprint("Organization %s alredy registred", orgID)}
+      return &processor.InvalidTransactionError{Msg: fmt.Sprint("Organization ", orgID, " alredy registred")}
     }
 
 		// Construct state register string
@@ -288,7 +288,7 @@ func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, cont
 		break;
 
 		default:
-			return &processor.InvalidTransactionError{Msg: fmt.Sprintf("Invalid transaction type: %v", txType)}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Invalid transaction type: ", txType)}
 	}
 	return nil
 }
