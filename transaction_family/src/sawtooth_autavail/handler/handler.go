@@ -18,6 +18,7 @@ const (
 	REGISTER_TYPE       = "register"
 	TXID_LENGTH         = 16
 	VERB_ADDRESS_LENGTH = 64
+	INITIAL_ORG_BALANCE = 2000.0
 )
 
 var logger *logging.Logger = logging.Get()
@@ -89,7 +90,7 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
 			 (len(title) == 0)              ||
 			 (len(description) == 0)        ||
 			 (len(dataType) == 0) {
-			return &processor.InvalidTransactionError{Msg: "Missing fields: %s", payload}
+			return &processor.InvalidTransactionError{Msg: "Incorrect fields: %s", payload}
 		}
 	  if floatPrice, err := strconv.ParseFloat(price,32); err != nil {
 			return &processor.InvalidTransactionError{Msg: "Price is not a valid float: %s. Error converting: %v", price, err}
@@ -150,7 +151,7 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
 			 (len(title) != 0)                       ||
 			 (len(description) != 0)                 ||
 			 (len(dataType) != 0) {
-			return &processor.InvalidTransactionError{Msg: "Missing fields: %s", payload}
+			return &processor.InvalidTransactionError{Msg: "Incorrect fields: %s", payload}
 		}
 
 		// Get state addresses
@@ -238,9 +239,46 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
 		// ------------------------- REGISTER -------------------------
 
 		case REGISTER_TYPE:
+
+		// Validate register transaction
+    if (len(txID) != 0)               ||
+       (len(advertisementTxID) != 0)  ||
+       (len(advertisementOrgID) != 0) ||
+       (len(price) != 0)              ||
+       (len(ipAddress) != 0)          ||
+       (len(orgID) == 0)              ||
+       (len(title) != 0)              ||
+       (len(description) != 0)        ||
+       (len(dataType) != 0) {
+      return &processor.InvalidTransactionError{Msg: "Incorrect fields: %s", payload}
+    }
+
 		// Get state address
-		// Validate advertisement transaction
-		// Apply advertisement transaction
+		hashedOrgID := Hexdigest(orgID)
+    orgAddress := self.namespace + hashedOrgID[len(hashedOrgID)-VERB_ADDRESS_LENGTH:]
+
+		// Get state information
+    stateQuery, err := context.GetState([]string{orgAddress})
+    if err != nil {
+      return err
+    }
+    if len(string(stateQuery[orgAddress])) > 0 {
+      return &processor.InvalidTransactionError{Msg: "Organization %s alredy registred", orgID}
+    }
+
+		// Construct state register string
+    registerStateData := fmt.Sprintf("%s:%f", orgID, INITIAL_ORG_BALANCE)
+
+		// Apply register transaction
+		adresses, err := context.SetState(map[string][]byte{
+      orgAddress: []byte(registerStateData),
+    })
+    if err != nil {
+      return err
+    }
+    if len(addresses) == 0 {
+      return &processor.InternalError{Msg: "No addresses in set response"}
+    }
 		break;
 
 		default:
