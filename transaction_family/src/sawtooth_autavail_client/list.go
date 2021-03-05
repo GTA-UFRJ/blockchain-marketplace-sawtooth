@@ -40,7 +40,7 @@ func (args *List) Run() error {
 	}
 
 	// Get list of transactions from state and print than
-	txSlice, err = autavailClient.List()
+	txSlice, err := autavailClient.List()
 	if err != nil {
 		return err
 	}

@@ -46,21 +46,28 @@ func NewAutAvailHandler(namespace string) *AutAvailHandler {
 }
 
 // Apply method gets called when a command (request) needs to be executed in order to change the state (context)
-func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, context *processor.Context) error {
-
+func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, context *processor.Context) error {
+/*
+	assetPrice := 0.0
+	_ = assetPrice
+	buyerBalance := 0.0
+	_ = buyerBalance
+	sellerBalance := 0.0
+	_ = sellerBalance
+*/
 	// Get transaction payload, transaction header and header signer public key
 	payloadData := request.GetPayload()
-	header := request.GetHeader()
-  sender := header.GetSignerPublicKey()
+	// header := request.GetHeader()
+  // sender := header.GetSignerPublicKey()
 	if payloadData == nil {
-		return &processor.InvalidTransactionError{Msg: "Must contain payload"}
+		return &processor.InvalidTransactionError{Msg: fmt.Sprint("Must contain payload")}
 	}
 
 	//As we define the payload as a ":"-separated string, we split the payload to process the transaction
 	payload := string(payloadData)
 	payloadSplit := strings.Split(payload,":")
 	if len(payloadSplit) != 9 {
-		return &processor.InvalidTransactionError{Msg: "Malformed payload: %s", payload}
+		return &processor.InvalidTransactionError{Msg: fmt.Sprint("Malformed payload: %s", payload)}
 	}
 	txType := payloadSplit[0]
 	txID := payloadSplit[1]
@@ -90,10 +97,10 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
 			 (len(title) == 0)              ||
 			 (len(description) == 0)        ||
 			 (len(dataType) == 0) {
-			return &processor.InvalidTransactionError{Msg: "Incorrect fields: %s", payload}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Incorrect fields: %s", payload)}
 		}
-	  if floatPrice, err := strconv.ParseFloat(price,32); err != nil {
-			return &processor.InvalidTransactionError{Msg: "Price is not a valid float: %s. Error converting: %v", price, err}
+	  if _, err := strconv.ParseFloat(price,32); err != nil {
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Price is not a valid float: %s. Error converting: %v", price, err)}
 		}
 
 		// Get state addresses
@@ -103,16 +110,16 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
 		orgAddress := self.namespace + hashedOrgID[len(hashedOrgID)-VERB_ADDRESS_LENGTH:]
 
 		// Get state information
-		stateQuery, err := context.GetState([]string{advertAddress, orgAdress})
+		stateQuery, err := context.GetState([]string{advertAddress, orgAddress})
 		if err != nil {
 			return err
 		}
 		if len(string(stateQuery[advertAddress])) > 0 {
-			return &processor.InvalidTransactionError{Msg: "Transaction %s alredy exists", txID}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Transaction %s alredy exists", txID)}
 		}
 		orgData := string(stateQuery[orgAddress])
 		if len(orgData) == 0 {
-			return &processor.InvalidTransactionError{Msg: "Organization %s not registred", orgID}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Organization %s not registred", orgID)}
 		}
 
 		// Construct state advert string
@@ -126,14 +133,14 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
 		dataType)
 
 		// Apply advertisement transaction
-		adresses, err := context.SetState(map[string][]byte{
+		addresses, err := context.SetState(map[string][]byte{
 			advertAddress: []byte(advertStateData),
 		})
 		if err != nil {
 			return err
 		}
 		if len(addresses) == 0 {
-			return &processor.InternalError{Msg: "No addresses in set response"}
+			return &processor.InternalError{Msg: fmt.Sprint("No addresses in set response")}
 		}
 		break;
 
@@ -151,13 +158,13 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
 			 (len(title) != 0)                       ||
 			 (len(description) != 0)                 ||
 			 (len(dataType) != 0) {
-			return &processor.InvalidTransactionError{Msg: "Incorrect fields: %s", payload}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Incorrect fields: %s", payload)}
 		}
 
 		// Get state addresses
 		hashedTxID := Hexdigest(txID)
 		buyAddress := self.namespace + hashedTxID[len(hashedTxID)-VERB_ADDRESS_LENGTH:]
-		hashedAdvertTxId := Hexdigest(advertisementTxID)
+		hashedAdvertTxID := Hexdigest(advertisementTxID)
 		advertAddress := self.namespace + hashedAdvertTxID[len(hashedAdvertTxID)-VERB_ADDRESS_LENGTH:]
 		hashedOrgID := Hexdigest(orgID)
 		buyOrgAddress := self.namespace + hashedOrgID[len(hashedOrgID)-VERB_ADDRESS_LENGTH:]
@@ -170,45 +177,44 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
 			return err
 		}
 		if len(string(stateQuery[buyAddress])) > 0 {
-			return &processor.InvalidTransactionError{Msg: "Transaction %s alredy exists", txID}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Transaction %s alredy exists", txID)}
 		}
 		advertTxData := string(stateQuery[advertAddress])
 		if len(advertTxData) == 0 {
-			return &processor.InvalidTransactionError{Msg: "Advertisement transaction %s does not exist", advertisementTxID}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Advertisement transaction %s does not exist", advertisementTxID)}
 		}
 		buyOrgData := string(stateQuery[buyOrgAddress])
 		if len(buyOrgData) == 0 {
-			return &processor.InvalidTransactionError{Msg: "Organization %s not registred", orgID}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Organization %s not registred", orgID)}
 		}
 		advertOrgData := string(stateQuery[advertOrgAddress])
 		if len(advertOrgData) == 0 {
-			return &processor.InvalidTransactionError{Msg: "Organization %s not registred", advertisementOrgID}
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Organization %s not registred", advertisementOrgID)}
 		}
 
 		// Obtain informations about advertisement transaction
-		advertTxDataSplit := strings.Split(advertTxData)
-		if assetPrice, err := strconv.ParseFloat(advertTxDataSplit[1],32), err != nil {
-			return &processor.InternalError{Msg: "Error reading price: %s", advertTxDataSplit[1]}
-		}
-		if advertTxDataSplit[3] != advertisementOrgId {
-			return &processor.InvalidTransactionError{Msg: "Advertisement transaction was not sent from this organization: %s", advertTxData}
+		advertTxDataSplit := strings.Split(advertTxData,":")
+		assetPrice, _ := strconv.ParseFloat(advertTxDataSplit[1],32)
+		_ = assetPrice
+		if advertTxDataSplit[3] != advertisementOrgID {
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Advertisement transaction was not sent from this organization: %s", advertTxData)}
 		}
 
 		// Obtain balances
 		buyOrgDataSplit := strings.Split(buyOrgData,":")
-		if buyerBalance, err := strconv.ParseFloat(buyOrgDataSplit[1],32), err != nil {
-			return &processor.InternalError{Msg: "Error reading balance: %s", buyOrgDataSplit[1]}
-		}
+		buyerBalance, _ := strconv.ParseFloat(buyOrgDataSplit[1],32)
+		_ = buyerBalance
+
 		advertOrgDataSplit := strings.Split(advertOrgData,":")
-		if sellerBalance, err := strconv.ParseFloat(advertOrgDataSplit[1],32), err != nil {
-			return &processor.InternalError{Msg: "Error reading balance: %s", advertOrgDataSplit[1]}
-		}
+		sellerBalance, _ := strconv.ParseFloat(advertOrgDataSplit[1],32)
+		_ = sellerBalance
 
 		// Compute balances if payment is allowed
-		if buyerBalance >= assetPrice {
-			buyerBalance -= assetPrice
-			sellerBalance += assetPrice
+		if buyerBalance < assetPrice {
+			return &processor.InvalidTransactionError{Msg: fmt.Sprint("Insuficient tokens: %f < %f", buyerBalance, assetPrice)}
 		}
+		buyerBalance -= assetPrice
+		sellerBalance += assetPrice
 
 		// Construct state buy string
 		buyStateData := fmt.Sprintf("%s:%s:%s:%s:%s",
@@ -223,16 +229,16 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
 		advertOrgStateData := fmt.Sprintf("%s:%f", advertisementOrgID, sellerBalance)
 
 		// Apply buy transaction
-		adresses, err := context.SetState(map[string][]byte{
+		addresses, err := context.SetState(map[string][]byte{
 			buyAddress: []byte(buyStateData),
 			buyOrgAddress: []byte(buyOrgStateData),
-			buyAdvertAddress: []byte(buyAdvertStateData),
+			advertOrgAddress: []byte(advertOrgStateData),
 		})
 		if err != nil {
 			return err
 		}
 		if len(addresses) == 0 {
-			return &processor.InternalError{Msg: "No addresses in set response"}
+			return &processor.InternalError{Msg: fmt.Sprint("No addresses in set response")}
 		}
 		break;
 
@@ -250,7 +256,7 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
        (len(title) != 0)              ||
        (len(description) != 0)        ||
        (len(dataType) != 0) {
-      return &processor.InvalidTransactionError{Msg: "Incorrect fields: %s", payload}
+      return &processor.InvalidTransactionError{Msg: fmt.Sprint("Incorrect fields: %s", payload)}
     }
 
 		// Get state address
@@ -263,21 +269,21 @@ func (self *AutAvailHandler) Apply(request *processor_p0b2.TpProcessRequest, con
       return err
     }
     if len(string(stateQuery[orgAddress])) > 0 {
-      return &processor.InvalidTransactionError{Msg: "Organization %s alredy registred", orgID}
+      return &processor.InvalidTransactionError{Msg: fmt.Sprint("Organization %s alredy registred", orgID)}
     }
 
 		// Construct state register string
     registerStateData := fmt.Sprintf("%s:%f", orgID, INITIAL_ORG_BALANCE)
 
 		// Apply register transaction
-		adresses, err := context.SetState(map[string][]byte{
+		addresses, err := context.SetState(map[string][]byte{
       orgAddress: []byte(registerStateData),
     })
     if err != nil {
       return err
     }
     if len(addresses) == 0 {
-      return &processor.InternalError{Msg: "No addresses in set response"}
+      return &processor.InternalError{Msg: fmt.Sprint("No addresses in set response")}
     }
 		break;
 

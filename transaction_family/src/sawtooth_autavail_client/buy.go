@@ -32,14 +32,14 @@ func (args *Buy) UrlPassed() string {
 }
 
 // Generate a 16 character hexadecimal lowercase random string to be the advertisement identifier number
-func (args *Buy) TxId () string {
+func (args *Buy) TxId () (string, error) {
 	nonce := make([]byte, 10)
   _, err := rand.Read(nonce)
   if err != nil {
-    return err
+    return "", err
   }
   txid := sha512.Sum512(nonce)
-  return hex.EncodeToString(txid[0:TXID_LENGTH])
+  return hex.EncodeToString(txid[0:TXID_LENGTH]), nil
 }
 
 // Apply AddCommand method to parser object
@@ -54,11 +54,14 @@ func (args *Buy) Register(parent *flags.Command) error {
 func (args *Buy) Run() error {
 	// Collect data to construct payload
 	txtype := args.Name()
-	txid := args.TxId()
+	txid, err := args.TxId()
 	adverttxid := args.Args.AdvertTxId
 	advertorgid := args.Args.AdvertOrgId
 	ipaddr := args.Args.IpAddr
 	orgid := args.Args.OrgId
+	if err != nil {
+    return err
+  }
 
 	// Construct client using URL to submit and keyfile to sign transactions
 	autavailClient, err := GetClient(args, true)

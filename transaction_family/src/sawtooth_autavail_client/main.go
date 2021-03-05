@@ -117,12 +117,13 @@ func GetClient(args Command, readFile bool) (AutavailClient, error) {
 	keyfile := ""
 	if readFile {
 		var err error
+		_ = err
 
 		// Get default keyfile path if keyfile arguement was not passed
 		if args.KeyfilePassed() == "" {
 			username, err := user.Current()
 			if err != nil {
-				return AutavailCilent{}, err
+				return NewAutavailClient("","")
 			}
 			keyfile = path.Join(username.HomeDir, ".sawtooth", "keys", username.Username+".priv")
 		} else {

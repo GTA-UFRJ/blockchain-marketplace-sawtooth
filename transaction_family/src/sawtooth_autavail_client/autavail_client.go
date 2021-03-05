@@ -31,7 +31,7 @@ type AutavailClient struct {
   Creates a signer private key
   Puts the signer and the URL in a struct
 */
-func NewAutavailClient(url string, keyfile string) (IntkeyClient, error) {
+func NewAutavailClient(url string, keyfile string) (AutavailClient, error) {
 
   var privateKey signing.PrivateKey
 
@@ -256,7 +256,7 @@ func (autavailClient AutavailClient) sendTransaction(
 	inputAdresses, outputAdresses := autavailClient.getAddress(txtype, txid, adverttxid, orgid, advertorgid)
 
 	// Construct the TransactionHeader
-	rawTransactionheader := transaction_pb2.TransactionHeader{
+	rawTransactionHeader := transaction_pb2.TransactionHeader{
 				SignerPublicKey:   autavailClient.signer.GetPublicKey().AsHex(),
 				FamilyName:        FAMILY_NAME,
 				FamilyVersion:     FAMILY_VERSION,
@@ -293,7 +293,7 @@ func (autavailClient AutavailClient) sendTransaction(
 	}
 
 	// Serialize batch list
-	batchId := rawBatchList.Batches[0].HeaderSignature
+	// batchId := rawBatchList.Batches[0].HeaderSignature
 	batchList, err := proto.Marshal(&rawBatchList)
 	if err != nil {
 		return "", errors.New(fmt.Sprintf("Unable to serialize batch list: %v", err))
@@ -301,7 +301,7 @@ func (autavailClient AutavailClient) sendTransaction(
 
 	// If url is "file", append batch list in file named "autavail.workload"
 	if autavailClient.url == "file" {
-		fileDescriptor, err := os.OpenFile("autavail.workload", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		f, err := os.OpenFile("autavail.workload", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			return "", errors.New(fmt.Sprintf("Unable to open file: %v", err))
     }
@@ -337,6 +337,8 @@ func (autavailClient AutavailClient) getAddress(
 	orgid string,
 	advertorgid string) ([]string, []string) {
 
+	inputAddresses := []string{}
+	outputAddresses := []string{}
 	prefix := autavailClient.getPrefix()
 	switch (txtype) {
 		case "advert":
@@ -349,10 +351,11 @@ func (autavailClient AutavailClient) getAddress(
 		advertOrgAddress := prefix + hashedOrdId[len(hashedOrdId)-FAMILY_VERB_ADDRESS_LENGTH:]
 
 		// TP will read to validate if the transacation and the organization alredy exists
-		inputAddresses := []string{advertAddress, advertOrgAddress}
+		inputAddresses = append(inputAddresses, advertAddress)
+		inputAddresses = append(inputAddresses, advertOrgAddress)
 
 		// TP will write the transaction
-		outputAddresses := []string{advertAddress}
+		outputAddresses = append(outputAddresses, advertAddress)
 		break;
 
 		case "buy":
@@ -373,10 +376,15 @@ func (autavailClient AutavailClient) getAddress(
 		advertOrgAddress := prefix + hashedAdvertOrgId[len(hashedAdvertOrgId)-FAMILY_VERB_ADDRESS_LENGTH:]
 
 		// TP will read to validate the buyer and seller balances and the buy and advert transactions existance
-		inputAddresses := []string{buyAddress, buyOrgAddress, advertAddress, advertOrgAddress}
+		inputAddresses = append(inputAddresses, buyAddress)
+		inputAddresses = append(inputAddresses, buyOrgAddress)
+		inputAddresses = append(inputAddresses, advertAddress)
+		inputAddresses = append(inputAddresses, advertOrgAddress)
 
 		// TP will write to the balances and apply the buy transactions
-		inputAddresses := []string{buyAddress, buyOrgAddress, advertOrgAddress}
+		outputAddresses = append(outputAddresses, buyAddress)
+		outputAddresses = append(outputAddresses, buyOrgAddress)
+		outputAddresses = append(outputAddresses, advertOrgAddress)
 		break;
 
 		case "register":
@@ -385,10 +393,10 @@ func (autavailClient AutavailClient) getAddress(
 		orgAddress := prefix + hashedOrgId[len(hashedOrgId)-FAMILY_VERB_ADDRESS_LENGTH:]
 
 		// TP will read to validate if the organization is alredy registred
-		inputAddresses := []string{orgAddress}
+		inputAddresses = append(inputAddresses, orgAddress)
 
 		// TP will write to register the organization
-		inputAddresses := []string{orgAddress}
+		outputAddresses = append(outputAddresses, orgAddress)
 		break;
 	}
 	return inputAddresses, outputAddresses
@@ -412,7 +420,7 @@ func (autavailClient AutavailClient) createBatchList(
 		SignerPublicKey: autavailClient.signer.GetPublicKey().AsHex(),
 		TransactionIds:  transactionSignatures,
 	}
-	batchHeader, err := proto.Marshal(rawBatchHeader)
+	batchHeader, err := proto.Marshal(&rawBatchHeader)
 	if err != nil {
 		return batch_pb2.BatchList{}, errors.New(fmt.Sprintf("Unable to serialize batch header: %v", err))
 	}
@@ -424,11 +432,11 @@ func (autavailClient AutavailClient) createBatchList(
 	batch := batch_pb2.Batch{
 		Header:          batchHeader,
 		Transactions:    transactions,
-		HeaderSignature: batchHeaderSignatures,
+		HeaderSignature: batchHeaderSignature,
 	}
 
 	// Construct BatchList
 	return batch_pb2.BatchList{
-		Batches: []*batch_pb2.Batch{&batch}
+		Batches: []*batch_pb2.Batch{&batch},
 	}, nil
 }
