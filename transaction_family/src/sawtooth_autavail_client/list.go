@@ -33,7 +33,7 @@ func (args *List) Register(parent *flags.Command) error {
 }
 
 func (args *List) Run() error {
-	//// Construct client using URL to submit
+	// Construct client using URL to submit
 	autavailClient, err := GetClient(args, false)
 	if err != nil {
 		return err
