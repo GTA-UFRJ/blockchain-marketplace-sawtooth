@@ -28,7 +28,7 @@ items:
               - "intkey-tp-python -vv -C tcp://$HOSTNAME:4004"
           
           - name: sawtooth-autavail-tp-go
-            image: guilhermeeec/sawtooth-autavail-tp-go
+            image: guilhermeeec/sawtooth-autavail-tp-go:3
             command:
               - bash
             args:
@@ -152,7 +152,7 @@ items:
                      sawtooth.poet.valid_enclave_basenames=$(cat /poet-shared/poet-enclave-basename) \
                      sawtooth.poet.initial_wait_time=15 \
                      sawtooth.poet.target_wait_time=15 \
-                     sawtooth.publisher.max_batches_per_block=200 \
+                     sawtooth.publisher.max_batches_per_block=1000 \
                      sawtooth.poet.key_block_claim_limit=100000 \
                      sawtooth.poet.ztest_minimum_win_count=100000 \
                      -o config.batch; \
@@ -172,17 +172,19 @@ items:
                 - name: poet-shared-0
                   mountPath: "/poet-shared"
 
+        imagePullSecrets:
+          - name: regcred
         volumes:
           - name: poet-shared-0
             emptyDir: {}
 
           - name: binary
             hostPath:
-              path: ./binary
+              path: /home/guiaraujo/Hyperledger-Sawtooth/blockchain-marketplace-sawtooth/sawtooth_benchmark/binary
 
           - name: scripts
             hostPath:
-              path: ./scripts
+              path: /home/guiaraujo/Hyperledger-Sawtooth/blockchain-marketplace-sawtooth/sawtooth_benchmark/scripts
 
 - apiVersion: v1
   kind: Service
@@ -238,7 +240,7 @@ items:
               - "intkey-tp-python -vv -C tcp://$HOSTNAME:4004"
 
           - name: sawtooth-autavail-tp-go
-            image: guilhermeeec/sawtooth-autavail-tp-go
+            image: guilhermeeec/sawtooth-autavail-tp-go:3
             command:
               - bash
             args:
@@ -335,17 +337,19 @@ items:
                 - name: poet-shared-1
                   mountPath: "/poet-shared"
 
+        imagePullSecrets:
+          - name: regcred
         volumes:
           - name: poet-shared-1
             emptyDir: {}
 
           - name: binary
             hostPath:
-              path: ./binary
+              path: /home/guiaraujo/Hyperledger-Sawtooth/blockchain-marketplace-sawtooth/sawtooth_benchmark/binary
 
           - name: scripts
             hostPath:
-              path: ./scripts
+              path: /home/guiaraujo/Hyperledger-Sawtooth/blockchain-marketplace-sawtooth/sawtooth_benchmark/scripts
 
 - apiVersion: v1
   kind: Service
@@ -401,7 +405,7 @@ items:
               - "intkey-tp-python -vv -C tcp://$HOSTNAME:4004"
 
           - name: sawtooth-autavail-tp-go
-            image: guilhermeeec/sawtooth-autavail-tp-go
+            image: guilhermeeec/sawtooth-autavail-tp-go:3
             command:
               - bash
             args:
@@ -498,17 +502,19 @@ items:
                 - name: poet-shared-2
                   mountPath: "/poet-shared"
 
+        imagePullSecrets:
+          - name: regcred
         volumes:
           - name: poet-shared-2
             emptyDir: {}
 
           - name: binary
             hostPath:
-              path: ./binary
+              path: /home/guiaraujo/Hyperledger-Sawtooth/blockchain-marketplace-sawtooth/sawtooth_benchmark/binary
 
           - name: scripts
             hostPath:
-              path: ./scripts
+              path: /home/guiaraujo/Hyperledger-Sawtooth/blockchain-marketplace-sawtooth/sawtooth_benchmark/scripts
 
 - apiVersion: v1
   kind: Service
@@ -564,7 +570,7 @@ items:
               - "intkey-tp-python -vv -C tcp://$HOSTNAME:4004"
 
           - name: sawtooth-autavail-tp-go
-            image: guilhermeeec/sawtooth-autavail-tp-go
+            image: guilhermeeec/sawtooth-autavail-tp-go:3
             command:
               - bash
             args:
@@ -661,17 +667,19 @@ items:
                 - name: poet-shared-3
                   mountPath: "/poet-shared"
 
+        imagePullSecrets:
+          - name: regcred
         volumes:
           - name: poet-shared-3
             emptyDir: {}
 
           - name: binary
             hostPath:
-              path: ./binary
+              path: /home/guiaraujo/Hyperledger-Sawtooth/blockchain-marketplace-sawtooth/sawtooth_benchmark/binary
 
           - name: scripts
             hostPath:
-              path: ./scripts
+              path: /home/guiaraujo/Hyperledger-Sawtooth/blockchain-marketplace-sawtooth/sawtooth_benchmark/scripts
 
 - apiVersion: v1
   kind: Service
