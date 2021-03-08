@@ -48,6 +48,17 @@ services:
         tail -f /dev/null \
         \"" 
   
+  shell-4:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-4
+    volumes:
+      - ./scripts:/scripts
+      - ./binary:/binary
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \"" 
+  
   validator-0:
     image: hyperledger/sawtooth-validator:chime
     container_name: sawtooth-validator-default-0
@@ -190,6 +201,36 @@ services:
         /project/sawtooth-core/consensus/poet/core"
     stop_signal: SIGKILL
 
+  validator-4:
+    image: hyperledger/sawtooth-validator:chime
+    container_name: sawtooth-validator-default-4
+    expose:
+      - 4004
+      - 5050
+      - 8800
+    volumes:
+      - poet-shared:/poet-shared
+    command: |
+      bash -c "
+        sawadm keygen --force && \
+        mkdir -p /poet-shared/validator-4 && \
+        cp -a /etc/sawtooth/keys /poet-shared/validator-4/ && \
+        sawtooth-validator -v \
+            --bind network:tcp://eth0:8800 \
+            --bind component:tcp://eth0:4004 \
+            --bind consensus:tcp://eth0:5050 \
+            --peering static \
+            --endpoint tcp://validator-4:8800 \
+            --peers tcp://validator-0:8800,tcp://validator-1:8800,tcp://validator-2:8800,tcp://validator-3:8800 \
+            --scheduler parallel \
+            --network-auth trust
+      "
+    environment:
+      PYTHONPATH: "/project/sawtooth-core/consensus/poet/common:\
+        /project/sawtooth-core/consensus/poet/simulator:\
+        /project/sawtooth-core/consensus/poet/core"
+    stop_signal: SIGKILL
+
   rest-api-0:
     image: hyperledger/sawtooth-rest-api:chime
     container_name: sawtooth-rest-api-default-0
@@ -244,6 +285,19 @@ services:
       "
     stop_signal: SIGKILL
 
+  rest-api-4:
+    image: hyperledger/sawtooth-rest-api:chime
+    container_name: sawtooth-rest-api-default-4
+    expose:
+      - 8008
+    command: |
+      bash -c "
+        sawtooth-rest-api \
+          --connect tcp://validator-4:4004 \
+          --bind rest-api-4:8008
+      "
+    stop_signal: SIGKILL
+
   intkey-tp-0:
     image: hyperledger/sawtooth-intkey-tp-python:chime
     container_name: sawtooth-intkey-tp-python-default-0
@@ -274,6 +328,14 @@ services:
     expose:
       - 4004
     command: intkey-tp-python -C tcp://validator-3:4004
+    stop_signal: SIGKILL
+
+  intkey-tp-4:
+    image: hyperledger/sawtooth-intkey-tp-python:chime
+    container_name: sawtooth-intkey-tp-python-default-4
+    expose:
+      - 4004
+    command: intkey-tp-python -C tcp://validator-4:4004
     stop_signal: SIGKILL
 
   autavail-tp-0:
@@ -316,6 +378,16 @@ services:
     command: autavail-tp-go -vv -C tcp://validator-3:4004
     stop_signal: SIGKILL
 
+  autavail-tp-4:
+    image: guilhermeeec/sawtooth-autavail-tp-go:3
+    container_name: sawtooth-autavail-tp-go-default-4
+    expose:
+      - 4004
+    volumes:
+      - ./binary:/binary
+    command: autavail-tp-go -vv -C tcp://validator-4:4004
+    stop_signal: SIGKILL
+
   settings-tp-0:
     image: hyperledger/sawtooth-settings-tp:chime
     container_name: sawtooth-settings-tp-default-0
@@ -346,6 +418,14 @@ services:
     expose:
       - 4004
     command: settings-tp -v -C tcp://validator-3:4004
+    stop_signal: SIGKILL
+
+  settings-tp-4:
+    image: hyperledger/sawtooth-settings-tp:chime
+    container_name: sawtooth-settings-tp-default-4
+    expose:
+      - 4004
+    command: settings-tp -v -C tcp://validator-4:4004
     stop_signal: SIGKILL
 
   poet-engine-0:
@@ -402,6 +482,17 @@ services:
         poet-engine -C tcp://validator-3:5050 --component tcp://validator-3:4004 \
     \""
 
+  poet-engine-4:
+    image: hyperledger/sawtooth-poet-engine:chime
+    container_name: sawtooth-poet-engine-4
+    volumes:
+      - poet-shared:/poet-shared
+    command: "bash -c \"\
+        while [ ! -f /poet-shared/validator-4/keys/validator.priv ]; do sleep 1; done && \
+        cp -a /poet-shared/validator-4/keys /etc/sawtooth && \
+        poet-engine -C tcp://validator-4:5050 --component tcp://validator-4:4004 \
+    \""
+
   poet-validator-registry-tp-0:
     image: hyperledger/sawtooth-poet-validator-registry-tp:chime
     container_name: sawtooth-poet-validator-registry-tp-0
@@ -438,6 +529,16 @@ services:
     expose:
       - 4004
     command: poet-validator-registry-tp -C tcp://validator-3:4004
+    environment:
+      PYTHONPATH: /project/sawtooth-core/consensus/poet/common
+    stop_signal: SIGKILL
+
+  poet-validator-registry-tp-4:
+    image: hyperledger/sawtooth-poet-validator-registry-tp:chime
+    container_name: sawtooth-poet-validator-registry-tp-4
+    expose:
+      - 4004
+    command: poet-validator-registry-tp -C tcp://validator-4:4004
     environment:
       PYTHONPATH: /project/sawtooth-core/consensus/poet/common
     stop_signal: SIGKILL
