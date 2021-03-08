@@ -1,0 +1,44 @@
+1) Autavail
+
+Usage:
+  autavail [OPTIONS] <command>
+
+Application Options:
+  -v, --verbose  Enable more verbose output
+
+Help Options:
+  -h, --help     Show this help message
+
+Available commands:
+  advert    Advertise data transactions value
+  buy       Buy data transactions value
+  list      Display all data anounced
+  register  Register organization
+
+Inside the container, send advertisement transaction to validator x:
+/binary/autavail-go advert 200 123456 title description 10.0.0.1 datatype --url="http://sawtooth-rest-api-default-x:8008"
+
+Before advertisement transaction:
+/binary/autavail-go register 123456 --url="http://sawtooth-rest-api-default-x:8008"
+
+Obs:
+In case of 1 node: --url="http://rest-api-default:8008"
+In caso of kubernetes, you must NOT use --url option
+
+2) Docker
+
+Initialize and finalize 1 node:
+docker-compose -f docker-node.yaml up -d
+docker-compose -f docker-node.yaml down -d
+
+Intialize and finalize a PoET N node network:
+docker-compose -f docker-poet-N.yaml up -d
+docker-compose -f docker-poet-N.yaml down -d
+
+Execute a command inside the CLI client container X:
+docker exec -t sawtooth-shell-default-X <comand>
+
+3) Sawtooth:
+
+Inside a container, list all transactions:
+sawtooth transaction list --url http://sawtooth-rest-api-default-x:8008
