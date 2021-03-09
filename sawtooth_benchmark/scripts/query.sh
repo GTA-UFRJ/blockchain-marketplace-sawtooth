@@ -1,9 +1,11 @@
-#! /bin/sh
+#!/bin/bash
 
-VALIDATED_INTKEY_TRANSACTIONS=0
-while [ $VALIDATED_INTKEY_TRANSACTIONS -le $1 ]
+clients=$3
+
+VALIDATED_TRANSACTIONS=0
+while [ $VALIDATED_TRANSACTIONS -lt $(($2*$clients)) ]
 do
-	VALIDATED_INTKEY_TRANSACTIONS=$(( $(sawtooth transaction list --url http://sawtooth-rest-api-default-0:8008 | wc -l) - 6 ))
+	VALIDATED_TRANSACTIONS=$(( $(sawtooth transaction list --url http://sawtooth-rest-api-default-0:8008 | wc -l) - 12 ))
 	sleep 1
 done
-date >> /tmp/sawtooth-timestamp
+date '+%M %s %N' >> $1/sawtooth-timestamp-transactions-$2-client-$3-round-$4

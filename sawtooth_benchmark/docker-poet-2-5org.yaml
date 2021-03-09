@@ -3,7 +3,7 @@ version: "2.1"
 volumes:
   poet-shared:
 
-services:
+services:  
   shell-0:
     image: hyperledger/sawtooth-shell:chime
     container_name: sawtooth-shell-default-0
@@ -25,40 +25,7 @@ services:
         sawtooth keygen && \
         tail -f /dev/null \
         \""
-  
-  shell-2:
-    image: hyperledger/sawtooth-shell:chime
-    container_name: sawtooth-shell-default-2
-    volumes:
-      - ./scripts:/scripts
-      - ./binary:/binary
-    entrypoint: "bash -c \"\
-        sawtooth keygen && \
-        tail -f /dev/null \
-        \""
-  
-  shell-3:
-    image: hyperledger/sawtooth-shell:chime
-    container_name: sawtooth-shell-default-3
-    volumes:
-      - ./scripts:/scripts
-      - ./binary:/binary
-    entrypoint: "bash -c \"\
-        sawtooth keygen && \
-        tail -f /dev/null \
-        \"" 
-  
-  shell-4:
-    image: hyperledger/sawtooth-shell:chime
-    container_name: sawtooth-shell-default-4
-    volumes:
-      - ./scripts:/scripts
-      - ./binary:/binary
-    entrypoint: "bash -c \"\
-        sawtooth keygen && \
-        tail -f /dev/null \
-        \"" 
-  
+
   validator-0:
     image: hyperledger/sawtooth-validator:chime
     container_name: sawtooth-validator-default-0
@@ -429,7 +396,7 @@ services:
     stop_signal: SIGKILL
 
   poet-engine-0:
-    image: hyperledger/sawtooth-poet-engine:chime
+    image: hyperledger/sawtooth-poet-engine:nightly
     container_name: sawtooth-poet-engine-0
     volumes:
       - poet-shared:/poet-shared
@@ -450,7 +417,7 @@ services:
     \""
 
   poet-engine-1:
-    image: hyperledger/sawtooth-poet-engine:chime
+    image: hyperledger/sawtooth-poet-engine:nightly
     container_name: sawtooth-poet-engine-1
     volumes:
       - poet-shared:/poet-shared
@@ -461,7 +428,7 @@ services:
     \""
 
   poet-engine-2:
-    image: hyperledger/sawtooth-poet-engine:chime
+    image: hyperledger/sawtooth-poet-engine:nightly
     container_name: sawtooth-poet-engine-2
     volumes:
       - poet-shared:/poet-shared
@@ -472,7 +439,7 @@ services:
     \""
 
   poet-engine-3:
-    image: hyperledger/sawtooth-poet-engine:chime
+    image: hyperledger/sawtooth-poet-engine:nightly
     container_name: sawtooth-poet-engine-3
     volumes:
       - poet-shared:/poet-shared
@@ -483,7 +450,7 @@ services:
     \""
 
   poet-engine-4:
-    image: hyperledger/sawtooth-poet-engine:chime
+    image: hyperledger/sawtooth-poet-engine:nightly
     container_name: sawtooth-poet-engine-4
     volumes:
       - poet-shared:/poet-shared
