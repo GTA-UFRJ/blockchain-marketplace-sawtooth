@@ -92,7 +92,7 @@ services:
 
   autavail-tp-0:
     image: guilhermeeec/sawtooth-autavail-tp-go:3
-    container_name: sawtooth-autavail-tp-go-default-0
+    container_name: sawtooth-autavail-tp-go-default-0 --max-queue-size 3200
     expose:
       - 4004
     volumes:

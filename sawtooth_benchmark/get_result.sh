@@ -4,9 +4,19 @@ path=/scripts/results
 transaction=50
 cmd="/binary/autavail-go register 123456 --url="http://sawtooth-rest-api-default-0:8008""
 
-docker-compose -f docker-poet-1.yaml down --remove-orphans -v >> /dev/null 2>&1
+for client in 1 2 4 8 16 32;
+do #4 8 16 32 64 do
+	docker-compose -f docker-poet-$client.yaml down --remove-orphans -v >> /dev/null 2>&1
+done
 
-for round in $(seq 1 10); 
+#faz backup dos resultados atuais antes de pegar os proximos
+if [ "$(ls -A .$path)" ]; then
+	backup=".$path/backup-$(date '+%F-%H-%M-%S')"
+	mkdir backup
+	mv .$path/* $backup
+fi
+
+for round in $(seq 1 15); 
 do
 	for client in 1 2 4 8 16 32; 
 	do #4 8 16 32 64 do
@@ -19,9 +29,8 @@ do
 		# dormir esperando a rede levantar
 		sleep 10
 		
-
 		docker exec sawtooth-shell-default-0 $cmd &
-		sleep 5
+		sleep 1
 	
 		# marcar o tempo 
 		date '+%M %s %N' >> ./scripts/results/initial-time-client-$client-transaction-$transaction-round-$round
@@ -41,8 +50,9 @@ do
 	
 		#printf "\n mimiu again"
 		# dormir esperando o resultado
-		sleep 10
+		sleep $((25 + $client))
 	
 		docker-compose -f docker-poet-$client.yaml down -v --remove-orphans >> /dev/null 2>&1
+		sleep $((20 + $client))
 	done;
 done
