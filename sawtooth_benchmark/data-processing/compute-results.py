@@ -53,7 +53,10 @@ def CalculateRoundThrowput (roundCount, entity):
 		initialTime = int(initialTimeFileLines[0].split(" ")[1])
 		finalTime = int(finalTimeFileLines[1].split(" ")[1]) - 10
 	else:
-		realTransaction = TRANSACTIONS
+		if (ENTITY_TYPE=="org"):
+			realTransaction = TRANSACTIONS
+		else:
+			realTransactions = TRANSACTIONS * entity
 		initialTime = int(initialTimeFileLines[0].split(" ")[1])
 		finalTime = int(finalTimeFileLines[0].split(" ")[1])
 

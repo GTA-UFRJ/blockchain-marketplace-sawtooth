@@ -2,7 +2,8 @@
 
 #faz backup dos resultados atuais antes de pegar os proximos
 if [ "$(ls -A ./scripts/results/)" ]; then
-   mv ./scripts/results/* ./backups/
+	cp -rf ./scripts/results/* ./backups/
+	rm -rf ./scripts/results/*
 fi
 bash ./one-org-results.sh
 bash ./poet-scalab-results.sh

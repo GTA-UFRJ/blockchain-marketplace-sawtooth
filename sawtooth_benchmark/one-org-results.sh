@@ -5,7 +5,7 @@ transaction=50
 cmd="/binary/autavail-go register 123456 --url="http://sawtooth-rest-api-default-0:8008""
 
 docker-compose -f docker-poet-64.yaml down --remove-orphans -v >> /dev/null 2>&1
-sleep 20
+sleep 30
 
 #faz backup dos resultados atuais antes de pegar os proximos
 #if [ "$(ls -A .$path)" ]; then
@@ -28,7 +28,7 @@ do
 		
 		#printf "\n mimiu"
 		# dormir esperando a rede levantar
-		sleep 10
+		sleep 20
 		
 		docker exec sawtooth-shell-default-0 $cmd
 		sleep 1
@@ -40,8 +40,7 @@ do
 		# executar o script
 		for i in $(seq 0 $(($client-1)));
 		do
-			docker exec sawtooth-shell-default-$i ./scripts/send_transactions.sh $path $transaction $client 4 & 
-	
+			docker exec sawtooth-shell-default-$i ./scripts/send_transactions.sh $path $transaction $client 2 & 	
 		done
 		
 		#printf "\n ta na hora do query"
