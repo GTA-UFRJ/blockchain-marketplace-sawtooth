@@ -4,49 +4,56 @@ import sys
 
 # Import global configuration parameters
 if(sys.argv[1]=="one-org"):
-	import one-org-config
-	ROUNDS = one-org-config.rounds
-	ENTITY_LIST = one-org-config.entityList
-	ENTITY_TYPE = one-org-config.entityType
-	TRANSACTIONS = one-org-config.transactions
+	ROUNDS = 15
+	ENTITY_LIST = [1, 2, 4, 8, 16, 32]
+	ENTITY_TYPE = "client"
+	TRANSACTIONS = 50
 
 if(sys.argv[1]=="poet-scalab"):
-	import poet-scalab-config
-	ROUNDS = poet-scalab.rounds
-	ENTITY_LIST = poet-scalab.entityList
-	ENTITY_TYPE = poet-scalab.entityType
-	TRANSACTIONS = poet-scalab.transactions
+	ROUNDS = 15
+	ENTITY_LIST = [2, 4, 6, 8]
+	ENTITY_TYPE = "org"
+	TRANSACTIONS = 250
 
-if(sys.argv[1]=="pbtt-scalab"):
-	import pbft-scalab-config
-	ROUNDS = pbft-scalab.rounds
-	ENTITY_LIST = pbft-scalab.entityList
-	ENTITY_TYPE = pbft-scalab.entityType
-	TRANSACTIONS = pbft-scalab.transactions
+if(sys.argv[1]=="pbft-scalab"):
+	ROUNDS = 15
+	ENTITY_LIST = [2, 4, 6, 8]
+	ENTITY_TYPE = "org"
+	TRANSACTIONS = 250
 
 def CalculateRoundThrowput (roundCount, entity):
-
+	
 	# Read time log file content
-	initialTimeFileName = "initial-time-"+ENTITY_TYPE+"-"entity+"-transaction-"+TRANSACTIONS+"-round-"+roundCount
+	initialTimeFileName = "initial-time-"+ENTITY_TYPE+"-"+str(entity)+"-transaction-"+str(TRANSACTIONS)+"-round-"+str(roundCount)
 	f=open(initialTimeFileName,"r")
 	initialTimeFileLines = f.readlines()
 	f.close()
 	
-	finalTimeFileName = "final-time-"+ENTITY_TYPE+"-"entity+"-transaction-"+TRANSACTIONS+"-round-"+roundCount
+	finalTimeFileName = "final-time-"+ENTITY_TYPE+"-"+str(entity)+"-transaction-"+str(TRANSACTIONS)+"-round-"+str(roundCount)
 	f=open(finalTimeFileName,"r")
 	finalTimeFileLines = f.readlines()
 	f.close()
+
+	#initialTimeFileLines = ["23 123456 123456"]
+	#finalTimeFileLines = ["23 123454 123456"]
 	
+	#initialTimeFileLines = ["23 123454 123456"]
+	#finalTimeFileLines = ["Number of transactions read:40", "23 123456 123456"]
+
 	# Verify if the number of transactions read is diferent
 	if (len(finalTimeFileLines)==2):
-		realTransaction = finalTimeFileLines[0].split(":")[1]
-		initialTime = initialTimeFileLines[0].split(" ")[1]
-		finalTime = finalTimeFileLines[1].split(" ")[1] - 10
+		realTransaction = int(finalTimeFileLines[0].split(":")[1])
+		initialTime = int(initialTimeFileLines[0].split(" ")[1])
+		finalTime = int(finalTimeFileLines[1].split(" ")[1]) - 10
 	else:
 		realTransaction = TRANSACTIONS
-		initialTime = initialTimeFileLines[0].split(" ")[1]
-		finalTime = finalTimeFileLines[0].split(" ")[1]
+		initialTime = int(initialTimeFileLines[0].split(" ")[1])
+		finalTime = int(finalTimeFileLines[0].split(" ")[1])
 
+	#realTransaction = 50
+	#finalTime = 12345678
+	#initialTime = 12345675
+	
 	# Calculate throwput
 	throwput = realTransaction / (finalTime - initialTime)
 	return round(throwput,2)
@@ -55,8 +62,8 @@ def LoopThrowRounds (entity):
 
 	# Loop throw ROUNDS
 	throwputsCalculations = []
-	for roundCount in range ROUNDS:
-		throwputsCalculations.append(CalculateRoundThrouwput(roundCount, entity))
+	for roundCount in range (ROUNDS):
+		throwputsCalculations.append(CalculateRoundThrowput(roundCount, entity))
 
 	# Calculate mean and standard deviation of throwput for certein number of entities
 	meanThrowput = statistics.mean(throwputsCalculations)
@@ -64,18 +71,24 @@ def LoopThrowRounds (entity):
 	return meanThrowput, stdevThrowput
 	
 def main ():
+	
+	#print(ROUNDS)
+	#print(ENTITY_LIST)
+	#print(ENTITY_TYPE)
+	#print(TRANSACTIONS)
 
 	# File to append
 	f = open("results.log","a+")
-	f.write("-------------------------------")
+	header = "\n----------"+sys.argv[1]+"----------\n"
+	f.write(header)
 	
 	# Loop throw entities quantity (number of clients or organizations)
-	resultsLineList = [none] * len(ENTITY_LIST)
 	for entity in ENTITY_LIST:
+		#entityMeanThrowput, entityStdevThrowput = 15.0, 3.1
 		entityMeanThrowput, entityStdevThrowput = LoopThrowRounds(entity)
-		resultsLineList[entity] = "Entity "+entity+" = "+entityMeanThrowput+" pm "+entityStdevThrowput+" txps"
-		f.write(resultsLineList[entity])
-	f.write("-------------------------------")
+		resultsLine = "Entity "+str(entity)+" = "+str(entityMeanThrowput)+" pm "+str(entityStdevThrowput)+" txps\n"
+		f.write(resultsLine)
+	f.write("\n")
 	f.close()
 
 if __name__ == "__main__":

@@ -8,4 +8,5 @@ bash ./one-org-results.sh
 bash ./poet-scalab-results.sh
 bash ./pbft-scalab-results.sh
 bash ./data-processing/compute-results.sh
-mv ./data-processing/results.log ./final-results-$(date '+%F-%H-%M-%S')
+cp ./data-processing/results.log .
+mv ./results.log ./final-results-$(date '+%F-%H-%M-%S')
