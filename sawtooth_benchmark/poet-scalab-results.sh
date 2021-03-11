@@ -20,7 +20,7 @@ mkdir .$path
 
 for round in $(seq 1 15); 
 do
-	for org in 2 4 6 8; 
+	for org in 2 4 6 8 10; 
 	do # 2 4 6 8 10 12 do
 
 		#printf "\n round $round start for $i clis start"	

@@ -19,7 +19,7 @@ mkdir .$path
 
 for round in $(seq 1 15); 
 do
-	for client in 1 2 4 8 16 32; 
+	for client in 1 2 4 8 16 32 64; 
 	do #4 8 16 32 64 do
 
 		#printf "\n round $k start for $i clis start"	
@@ -40,7 +40,7 @@ do
 		# executar o script
 		for i in $(seq 0 $(($client-1)));
 		do
-			docker exec sawtooth-shell-default-$i ./scripts/send_transactions.sh $path $transaction $client & 
+			docker exec sawtooth-shell-default-$i ./scripts/send_transactions.sh $path $transaction $client 4 & 
 	
 		done
 		

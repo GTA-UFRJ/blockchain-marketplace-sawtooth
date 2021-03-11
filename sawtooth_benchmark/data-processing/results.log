@@ -1,0 +1,23 @@
+
+----------one-org----------
+Entity 1 = 0 pm 0 txps
+Entity 2 = 0 pm 0 txps
+Entity 4 = 3.35 pm 2.7 txps
+Entity 8 = 6.74 pm 4.56 txps
+Entity 16 = 8.35 pm 8.55 txps
+Entity 32 = 12.03 pm 11.23 txps
+
+
+----------poet-scalab----------
+Entity 2 = 34.84 pm 15.93 txps
+Entity 4 = 34.53 pm 9.4 txps
+Entity 6 = 32.97 pm 9.18 txps
+Entity 8 = 25.73 pm 8.35 txps
+
+
+----------pbft-scalab----------
+Entity 2 = 0 pm 0 txps
+Entity 4 = 40.42 pm 1.5 txps
+Entity 6 = 33.12 pm 2.17 txps
+Entity 8 = 0 pm 0 txps
+

@@ -103,12 +103,12 @@ services:
 
   autavail-tp-0:
     image: guilhermeeec/sawtooth-autavail-tp-go:3
-    container_name: sawtooth-autavail-tp-go-default-0 --max-queue-size 3200
+    container_name: sawtooth-autavail-tp-go-default-0
     expose:
       - 4004
     volumes:
       - ./binary:/binary
-    command: autavail-tp-go -vv -C tcp://validator-0:4004
+    command: autavail-tp-go -vv -C tcp://validator-0:4004 --max-queue-size 3200
     stop_signal: SIGKILL
 
   settings-tp-0:

@@ -1,23 +1,24 @@
 # Packages
 import statistics
 import sys
+from pathlib import Path
 
 # Import global configuration parameters
 if(sys.argv[1]=="one-org"):
 	ROUNDS = 15
-	ENTITY_LIST = [1, 2, 4, 8, 16, 32]
+	ENTITY_LIST = [1, 2, 4, 8, 16, 32, 64]
 	ENTITY_TYPE = "client"
 	TRANSACTIONS = 50
 
 if(sys.argv[1]=="poet-scalab"):
 	ROUNDS = 15
-	ENTITY_LIST = [2, 4, 6, 8]
+	ENTITY_LIST = [2, 4, 6, 8, 10]
 	ENTITY_TYPE = "org"
 	TRANSACTIONS = 250
 
 if(sys.argv[1]=="pbft-scalab"):
 	ROUNDS = 15
-	ENTITY_LIST = [2, 4, 6, 8]
+	ENTITY_LIST = [2, 4, 6, 8, 10]
 	ENTITY_TYPE = "org"
 	TRANSACTIONS = 250
 
@@ -25,14 +26,20 @@ def CalculateRoundThrowput (roundCount, entity):
 	
 	# Read time log file content
 	initialTimeFileName = "initial-time-"+ENTITY_TYPE+"-"+str(entity)+"-transaction-"+str(TRANSACTIONS)+"-round-"+str(roundCount)
-	f=open(initialTimeFileName,"r")
-	initialTimeFileLines = f.readlines()
-	f.close()
+	if Path(initialTimeFileName).is_file():
+		f=open(initialTimeFileName,"r")
+		initialTimeFileLines = f.readlines()
+		f.close()
+	else:
+		return -1
 	
 	finalTimeFileName = "final-time-"+ENTITY_TYPE+"-"+str(entity)+"-transaction-"+str(TRANSACTIONS)+"-round-"+str(roundCount)
-	f=open(finalTimeFileName,"r")
-	finalTimeFileLines = f.readlines()
-	f.close()
+	if Path(finalTimeFileName).is_file():
+		f=open(finalTimeFileName,"r")
+		finalTimeFileLines = f.readlines()
+		f.close()
+	else:
+		return -1
 
 	#initialTimeFileLines = ["23 123456 123456"]
 	#finalTimeFileLines = ["23 123454 123456"]
@@ -42,7 +49,7 @@ def CalculateRoundThrowput (roundCount, entity):
 
 	# Verify if the number of transactions read is diferent
 	if (len(finalTimeFileLines)==2):
-		realTransaction = int(finalTimeFileLines[0].split(":")[1])
+		realTransaction = int(finalTimeFileLines[0].split(":")[1].split(" ")[0])
 		initialTime = int(initialTimeFileLines[0].split(" ")[1])
 		finalTime = int(finalTimeFileLines[1].split(" ")[1]) - 10
 	else:
@@ -55,20 +62,29 @@ def CalculateRoundThrowput (roundCount, entity):
 	#initialTime = 12345675
 	
 	# Calculate throwput
-	throwput = realTransaction / (finalTime - initialTime)
-	return round(throwput,2)
+	return realTransaction / (finalTime - initialTime)
 
 def LoopThrowRounds (entity):
 
 	# Loop throw ROUNDS
-	throwputsCalculations = []
+	throwputsCalculationsWithNegative = []
 	for roundCount in range (ROUNDS):
-		throwputsCalculations.append(CalculateRoundThrowput(roundCount, entity))
+		throwputsCalculationsWithNegative.append(CalculateRoundThrowput(roundCount+1, entity))
+
+	# Eliminate negative values
+	throwputsCalculations = throwputsCalculationsWithNegative[:]
+	for item in throwputsCalculationsWithNegative:
+		if item < 0:
+			throwputsCalculations.remove(item)
+
+	# Verify if there are no values to calculate
+	if (len(throwputsCalculations) == 0):
+		return 0, 0
 
 	# Calculate mean and standard deviation of throwput for certein number of entities
 	meanThrowput = statistics.mean(throwputsCalculations)
 	stdevThrowput = statistics.pstdev(throwputsCalculations)
-	return meanThrowput, stdevThrowput
+	return round(meanThrowput,2), round(stdevThrowput,2)
 	
 def main ():
 	
@@ -86,7 +102,7 @@ def main ():
 	for entity in ENTITY_LIST:
 		#entityMeanThrowput, entityStdevThrowput = 15.0, 3.1
 		entityMeanThrowput, entityStdevThrowput = LoopThrowRounds(entity)
-		resultsLine = "Entity "+str(entity)+" = "+str(entityMeanThrowput)+" pm "+str(entityStdevThrowput)+" txps\n"
+		resultsLine = "Entity "+str(entity)+" = ("+str(entityMeanThrowput)+" pm "+str(entityStdevThrowput)+") txns/sec\n"
 		f.write(resultsLine)
 	f.write("\n")
 	f.close()
