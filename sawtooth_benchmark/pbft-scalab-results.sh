@@ -46,7 +46,7 @@ do
                 rm ./scripts/autavail.workload
             fi
             docker exec sawtooth-shell-default-$client /scripts/generate-workload.sh $(($transaction/$org))
-            docker exec sawtooth-shell-default-$client sawtooth batch submit -f /scripts/autavail.workload --url http://sawtooth-rest-api-default-$client:8008 &
+            docker exec sawtooth-shell-default-$client sawtooth batch submit -f autavail.workload --url http://sawtooth-rest-api-default-$client:8008 &
         done
 
 		#printf "\n ta na hora do query"

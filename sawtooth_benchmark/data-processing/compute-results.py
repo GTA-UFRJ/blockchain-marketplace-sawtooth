@@ -6,7 +6,7 @@ from pathlib import Path
 # Import global configuration parameters
 if(sys.argv[1]=="one-org"):
 	ROUNDS = 10
-	ENTITY_LIST = [1, 2, 4, 8, 16, 32, 64]
+	ENTITY_LIST = [1, 2, 4, 8, 16, 32]
 	ENTITY_TYPE = "client"
 	TRANSACTIONS = 50
 
@@ -56,7 +56,7 @@ def CalculateRoundThrowput (roundCount, entity):
 		if (ENTITY_TYPE=="org"):
 			realTransaction = TRANSACTIONS
 		else:
-			realTransactions = TRANSACTIONS * entity
+			realTransaction = TRANSACTIONS * entity
 		initialTime = int(initialTimeFileLines[0].split(" ")[1])
 		finalTime = int(finalTimeFileLines[0].split(" ")[1])
 
