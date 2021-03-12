@@ -1,0 +1,52 @@
+Two transactions per second (50):
+
+----------one-org----------
+Entity 1 = (1.71 pm 0.14) txns/sec
+Entity 2 = (3.0 pm 0.29) txns/sec
+Entity 4 = (5.72 pm 0.41) txns/sec
+Entity 8 = (11.06 pm 1.53) txns/sec
+Entity 16 = (14.82 pm 4.98) txns/sec
+Entity 32 = (14.9 pm 2.92) txns/sec
+
+Three transactions per second (50):
+
+----------one-org----------
+Entity 1 = (2.23 pm 0.2) txns/sec
+Entity 2 = (4.29 pm 0.29) txns/sec
+Entity 4 = (7.87 pm 1.11) txns/sec
+Entity 8 = (15.28 pm 2.12) txns/sec
+Entity 16 = (20.22 pm 4.73) txns/sec
+Entity 32 = (20.04 pm 1.62) txns/sec
+
+Distributed transaction emitting (240):
+
+----------poet-scalab----------
+Entity 2 = (22.9 pm 4.82) txns/sec
+Entity 4 = (18.04 pm 5.13) txns/sec
+Entity 6 = (21.18 pm 2.73) txns/sec
+Entity 8 = (18.19 pm 3.92) txns/sec
+Entity 10 = (16.57 pm 1.81) txns/sec
+
+----------pbft-scalab----------
+Entity 2 = (0 pm 0) txns/sec
+Entity 4 = (19.78 pm 0.56) txns/sec
+Entity 6 = (19.27 pm 1.82) txns/sec
+Entity 8 = (18.57 pm 1.11) txns/sec
+Entity 10 = (16.11 pm 1.67) txns/sec
+
+Concentrated transaction emmiting (250):
+
+----------poet-scalab----------
+Entity 2 = (40.58 pm 15.68) txns/sec
+Entity 4 = (41.5 pm 12.58) txns/sec
+Entity 6 = (28.89 pm 6.38) txns/sec
+Entity 8 = (25.78 pm 3.03) txns/sec
+Entity 10 = (22.89 pm 5.2) txns/sec
+
+----------pbft-scalab----------
+Entity 2 = (0 pm 0) txns/sec
+Entity 4 = (36.6 pm 4.49) txns/sec
+Entity 6 = (31.94 pm 2.0) txns/sec
+Entity 8 = (29.94 pm 1.36) txns/sec
+Entity 10 = (26.2 pm 1.32) txns/sec
+

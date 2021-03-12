@@ -19,7 +19,7 @@ sleep 30
 path="/scripts/results/one-org-results-$(date '+%F-%H-%M-%S')"
 mkdir .$path
 
-for round in $(seq 3 $rounds); 
+for round in $(seq 1 $rounds); 
 do
 	for client in 1 2 4 8 16 32; 
 	do #4 8 16 32 64 do
@@ -42,7 +42,7 @@ do
 		# executar o script
 		for i in $(seq 0 $(($client-1)));
 		do
-			sleep 0.1 ; docker exec sawtooth-shell-default-$i ./scripts/send_transactions.sh $path $transaction $client 2 & 	
+			sleep 0.1 ; docker exec sawtooth-shell-default-$i ./scripts/send_transactions.sh $path $transaction $client 3 & 	
 		done
 		
 		#printf "\n ta na hora do query"

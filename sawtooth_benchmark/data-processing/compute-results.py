@@ -14,13 +14,13 @@ if(sys.argv[1]=="poet-scalab"):
 	ROUNDS = 10
 	ENTITY_LIST = [2, 4, 6, 8, 10]
 	ENTITY_TYPE = "org"
-	TRANSACTIONS = 240
+	TRANSACTIONS = 200
 
 if(sys.argv[1]=="pbft-scalab"):
 	ROUNDS = 10
 	ENTITY_LIST = [2, 4, 6, 8, 10]
 	ENTITY_TYPE = "org"
-	TRANSACTIONS = 240
+	TRANSACTIONS = 200
 
 def CalculateRoundThrowput (roundCount, entity):
 	
@@ -65,6 +65,12 @@ def CalculateRoundThrowput (roundCount, entity):
 	#initialTime = 12345675
 	
 	# Calculate throwput
+	if (ENTITY_TYPE=="org"):
+		if (realTransaction < (TRANSACTIONS/5)):
+			return -1
+	else:
+		if (realTransaction < ((TRANSACTIONS * entity)/5)):
+			return -1
 	return realTransaction / (finalTime - initialTime)
 
 def LoopThrowRounds (entity):

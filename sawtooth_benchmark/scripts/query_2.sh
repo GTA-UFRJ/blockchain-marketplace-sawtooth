@@ -23,7 +23,7 @@ do
 	TIME_CONTROL=$((TIME_CONTROL*FLAG_WAIT_TIME))
 	sleep 1
 done
-if [ $2 -gt 200 ]; then
+if [ $2 -gt 180 ]; then
 	date '+%M %s %N' >> $1/final-time-org-$3-transaction-$2-round-$4
 else
 	date '+%M %s %N' >> $1/final-time-client-$3-transaction-$2-round-$4

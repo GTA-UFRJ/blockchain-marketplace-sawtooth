@@ -3,7 +3,7 @@
 rounds=$1
 
 #path=/scripts/results
-transaction=240
+transaction=200
 cmd="/binary/autavail-go register 123456 --url="http://sawtooth-rest-api-default-0:8008""
 
 docker-compose -f docker-poet-org8.yaml down --remove-orphans -v >> /dev/null 2>&1
@@ -36,18 +36,15 @@ do
 		
 		docker exec sawtooth-shell-default-0 $cmd
 		sleep 1
+
+		#gera workload
+		docker exec sawtooth-shell-default-0 /scripts/generate-workload.sh $transaction
 	
 		# marcar o tempo 
 		date '+%M %s %N' >> .$path/initial-time-org-$org-transaction-$transaction-round-$round
 		
-		# gera workload e envia transacoes
-		for client in $(seq 0 $(($org-1))); do
-			if [ -f "./scripts/autavail.workload" ]; then
-				rm ./scripts/autavail.workload
-			fi
-			docker exec sawtooth-shell-default-$client /scripts/generate-workload.sh $(($transaction/$org))
-			docker exec sawtooth-shell-default-$client sawtooth batch submit -f autavail.workload --url http://sawtooth-rest-api-default-$client:8008 &	
-		done
+		#  envia transacoes
+		docker exec sawtooth-shell-default-0 sawtooth batch submit -f autavail.workload --url http://sawtooth-rest-api-default-0:8008 &	
 
 		#printf "\n ta na hora do query"
 		# consultar transações
