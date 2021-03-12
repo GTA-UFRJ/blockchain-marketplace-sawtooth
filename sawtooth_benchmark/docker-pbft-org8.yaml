@@ -19,6 +19,104 @@ services:
       "
     stop_signal: SIGKILL
 
+  shell-1:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-1
+    volumes:
+      - pbft-shared:/pbft-shared
+      - ./scripts:/scripts
+      - ./binary:/binary
+    command: |
+      bash -c "
+        sawtooth keygen
+        tail -f /dev/null
+      "
+    stop_signal: SIGKILL
+
+  shell-2:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-2
+    volumes:
+      - pbft-shared:/pbft-shared
+      - ./scripts:/scripts
+      - ./binary:/binary
+    command: |
+      bash -c "
+        sawtooth keygen
+        tail -f /dev/null
+      "
+    stop_signal: SIGKILL
+
+  shell-3:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-3
+    volumes:
+      - pbft-shared:/pbft-shared
+      - ./scripts:/scripts
+      - ./binary:/binary
+    command: |
+      bash -c "
+        sawtooth keygen
+        tail -f /dev/null
+      "
+    stop_signal: SIGKILL
+
+  shell-4:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-4
+    volumes:
+      - pbft-shared:/pbft-shared
+      - ./scripts:/scripts
+      - ./binary:/binary
+    command: |
+      bash -c "
+        sawtooth keygen
+        tail -f /dev/null
+      "
+    stop_signal: SIGKILL
+
+  shell-5:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-5
+    volumes:
+      - pbft-shared:/pbft-shared
+      - ./scripts:/scripts
+      - ./binary:/binary
+    command: |
+      bash -c "
+        sawtooth keygen
+        tail -f /dev/null
+      "
+    stop_signal: SIGKILL
+
+  shell-6:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-6
+    volumes:
+      - pbft-shared:/pbft-shared
+      - ./scripts:/scripts
+      - ./binary:/binary
+    command: |
+      bash -c "
+        sawtooth keygen
+        tail -f /dev/null
+      "
+    stop_signal: SIGKILL
+
+  shell-7:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-7
+    volumes:
+      - pbft-shared:/pbft-shared
+      - ./scripts:/scripts
+      - ./binary:/binary
+    command: |
+      bash -c "
+        sawtooth keygen
+        tail -f /dev/null
+      "
+    stop_signal: SIGKILL
+
   rest-api-0:
     image: hyperledger/sawtooth-rest-api:chime
     container_name: sawtooth-rest-api-default-0

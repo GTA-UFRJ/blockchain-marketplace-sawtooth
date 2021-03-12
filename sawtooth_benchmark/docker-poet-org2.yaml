@@ -14,6 +14,17 @@ services:
         sawtooth keygen && \
         tail -f /dev/null \
         \""
+
+  shell-1:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-1
+    volumes:
+      - ./scripts:/scripts
+      - ./binary:/binary
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \""
   
   validator-0:
     image: hyperledger/sawtooth-validator:chime

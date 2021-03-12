@@ -18,6 +18,20 @@ services:
       "
     stop_signal: SIGKILL
 
+  shell-1:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-1
+    volumes:
+      - pbft-shared:/pbft-shared
+      - ./scripts:/scripts
+      - ./binary:/binary
+    command: |
+      bash -c "
+        sawtooth keygen
+        tail -f /dev/null
+      "
+    stop_signal: SIGKILL
+
   rest-api-0:
     image: hyperledger/sawtooth-rest-api:chime
     container_name: sawtooth-rest-api-default-0

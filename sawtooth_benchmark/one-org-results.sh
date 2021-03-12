@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rounds=$1
+
 #path=/scripts/results
 transaction=50
 cmd="/binary/autavail-go register 123456 --url="http://sawtooth-rest-api-default-0:8008""
@@ -17,14 +19,14 @@ sleep 30
 path="/scripts/results/one-org-results-$(date '+%F-%H-%M-%S')"
 mkdir .$path
 
-for round in $(seq 1 15); 
+for round in $(seq 1 $rounds); 
 do
 	for client in 1 2 4 8 16 32 64; 
 	do #4 8 16 32 64 do
 
 		#printf "\n round $k start for $i clis start"	
 		# levantar a rede
-		docker-compose -f docker-poet-$client.yaml up -d >> /dev/null 2>&1
+		docker-compose -f docker-poet-$client.yaml up -d >> /dev/null 2>&1 &
 		
 		#printf "\n mimiu"
 		# dormir esperando a rede levantar
@@ -40,19 +42,25 @@ do
 		# executar o script
 		for i in $(seq 0 $(($client-1)));
 		do
-			docker exec sawtooth-shell-default-$i ./scripts/send_transactions.sh $path $transaction $client 2 & 	
+			docker exec sawtooth-shell-default-$i ./scripts/send_transactions.sh $path $transaction $client 2; sleep 0.1 & 	
 		done
 		
 		#printf "\n ta na hora do query"
 
 		# consultar transações
-		docker exec sawtooth-shell-default-0 ./scripts/query.sh $path $transaction $client $round  
+		docker exec sawtooth-shell-default-0 ./scripts/query.sh $path $transaction $client $round &
+
+		finish=$(ps aux | grep send_transactions.sh | wc -l)
+		while [ $finish -gt 1 ]; do
+			finish=$(ps aux | grep send_transactions.sh | wc -l)
+		done
+		echo "Finish: $(date '+%M %s %N')" >> .$path/initial-time-client-$client-transaction-$transaction-round-$round
 	
 		#printf "\n mimiu again"
 		# dormir esperando o resultado
-		sleep $((25 + $client))
+		sleep $((30 + $client))
 	
-		docker-compose -f docker-poet-$client.yaml down -v --remove-orphans >> /dev/null 2>&1
+		docker-compose -f docker-poet-$client.yaml down -v --remove-orphans >> /dev/null 2>&1 &
 		sleep $((10 + $client))
 	done;
 done

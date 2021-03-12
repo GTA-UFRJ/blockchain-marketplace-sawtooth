@@ -5,22 +5,22 @@ from pathlib import Path
 
 # Import global configuration parameters
 if(sys.argv[1]=="one-org"):
-	ROUNDS = 15
+	ROUNDS = 10
 	ENTITY_LIST = [1, 2, 4, 8, 16, 32, 64]
 	ENTITY_TYPE = "client"
 	TRANSACTIONS = 50
 
 if(sys.argv[1]=="poet-scalab"):
-	ROUNDS = 15
+	ROUNDS = 10
 	ENTITY_LIST = [2, 4, 6, 8, 10]
 	ENTITY_TYPE = "org"
-	TRANSACTIONS = 250
+	TRANSACTIONS = 240
 
 if(sys.argv[1]=="pbft-scalab"):
-	ROUNDS = 15
+	ROUNDS = 10
 	ENTITY_LIST = [2, 4, 6, 8, 10]
 	ENTITY_TYPE = "org"
-	TRANSACTIONS = 250
+	TRANSACTIONS = 240
 
 def CalculateRoundThrowput (roundCount, entity):
 	

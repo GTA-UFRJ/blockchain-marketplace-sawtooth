@@ -22,7 +22,7 @@ function issueTransaction() {
 			current=$(date +%s%N | cut -b1-13)
 		done
 		#echo "ola"
-        /binary/autavail-go advert 200 123456 title description 10.0.0.1 datatype --url="http://sawtooth-rest-api-default-0:8008"
+        /binary/autavail-go advert 200 123456 title description 10.0.0.1 datatype --url="http://sawtooth-rest-api-default-0:8008" &
     done ; }  
 }
 

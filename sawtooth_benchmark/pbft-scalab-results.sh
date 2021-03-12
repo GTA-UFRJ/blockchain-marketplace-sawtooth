@@ -1,7 +1,9 @@
 #!/bin/bash
 
+rounds=$1
+
 #path=/scripts/results
-transaction=250
+transaction=240
 cmd="/binary/autavail-go register 123456 --url="http://sawtooth-rest-api-default-0:8008""
 
 docker-compose -f docker-pbft-org8.yaml down --remove-orphans -v >> /dev/null 2>&1
@@ -18,48 +20,44 @@ sleep 10
 path="/scripts/results/pbft-scalab-results-$(date '+%F-%H-%M-%S')"
 mkdir .$path
 
-for round in $(seq 1 15); 
+for round in $(seq 1 $rounds); 
 do
 	for org in 2 4 6 8 10; 
 	do # 2 4 6 8 10 12 do
 
 		#printf "\n round $round start for $i clis start"	
 		# levantar a rede
-		docker-compose -f docker-pbft-org$org.yaml up -d >> /dev/null 2>&1
+		docker-compose -f docker-pbft-org$org.yaml up -d >> /dev/null 2>&1 &
 		#docker-compose -f docker-pbft-org$org.yaml up -d
 		
 		#printf "\n mimiu"
 		# dormir esperando a rede levantar
-		sleep 10
+		sleep 20
 		
 		docker exec sawtooth-shell-default-0 $cmd
 		sleep 1
-	
-		# gera workload
-		if [ -f "./scripts/autavail.workload" ]; then
-			rm ./scripts/autavail.workload
-		fi
-		if [ -f "./binary/autavail.workload" ]; then
-            rm ./binary/autavail.workload
-        fi
-		docker exec sawtooth-shell-default-0 ./scripts/generate-workload.sh $transaction
-		sleep 20
-	
-		# marcar o tempo 
-		date '+%M %s %N' >> .$path/initial-time-org-$org-transaction-$transaction-round-$round
-				
-		# enviar transacoes
-		docker exec sawtooth-shell-default-0 sawtooth batch submit -f autavail.workload --url http://sawtooth-rest-api-default-0:8008 &
+
+		# marcar o tempo
+        date '+%M %s %N' >> .$path/initial-time-org-$org-transaction-$transaction-round-$round
+
+        # gera workload e envia transacoes
+        for client in $(seq 0 $(($org-1))); do
+            if [ -f "./scripts/autavail.workload" ]; then
+                rm ./scripts/autavail.workload
+            fi
+            docker exec sawtooth-shell-default-$client /scripts/generate-workload.sh $(($transaction/$org))
+            docker exec sawtooth-shell-default-$client sawtooth batch submit -f /scripts/autavail.workload --url http://sawtooth-rest-api-default-$client:8008 &
+        done
 
 		#printf "\n ta na hora do query"
 		# consultar transações
-		docker exec sawtooth-shell-default-0 ./scripts/query_2.sh $path $transaction $org $round
+		docker exec sawtooth-shell-default-0 /scripts/query_2.sh $path $transaction $org $round &
 	
 		#printf "\n mimiu again"
 		# dormir esperando o resultado
 		sleep $((25+$org))
 	
-		docker-compose -f docker-pbft-org$org.yaml down -v --remove-orphans >> /dev/null 2>&1
+		docker-compose -f docker-pbft-org$org.yaml down -v --remove-orphans >> /dev/null 2>&1 &
 		#docker-compose -f docker-pbft-org$org.yaml down -v --remove-orphans >> /dev/null 2>&1
 		sleep $((10+$org))
 	done;
