@@ -1,0 +1,25 @@
+
+----------one-org----------
+Entity 1 = (0 pm 0) txns/sec
+Entity 2 = (0 pm 0) txns/sec
+Entity 4 = (0 pm 0) txns/sec
+Entity 8 = (0 pm 0) txns/sec
+Entity 16 = (0 pm 0) txns/sec
+Entity 32 = (0 pm 0) txns/sec
+
+
+----------poet-scalab----------
+Entity 2 = (0 pm 0) txns/sec
+Entity 4 = (21.48 pm 0.39) txns/sec
+Entity 6 = (20.54 pm 0.51) txns/sec
+Entity 8 = (19.27 pm 0.5) txns/sec
+Entity 10 = (18.61 pm 0.56) txns/sec
+
+
+----------pbft-scalab----------
+Entity 2 = (0 pm 0) txns/sec
+Entity 4 = (21.18 pm 1.47) txns/sec
+Entity 6 = (20.87 pm 0.41) txns/sec
+Entity 8 = (19.42 pm 0.73) txns/sec
+Entity 10 = (18.03 pm 1.08) txns/sec
+

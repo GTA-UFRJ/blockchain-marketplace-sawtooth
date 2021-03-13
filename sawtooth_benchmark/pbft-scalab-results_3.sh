@@ -22,8 +22,10 @@ mkdir .$path
 
 for round in $(seq 1 $rounds); 
 do
+	echo "Starting round $round for PoET scalability test"
 	for org in 2 4 6 8 10; 
 	do # 2 4 6 8 10 12 do
+        echo "$org organizations"
 
 		#printf "\n round $round start for $i clis start"	
 		# levantar a rede
@@ -38,7 +40,7 @@ do
 		sleep 1
 
 		# marcar o tempo
-        date '+%M %s %N' >> .$path/initial-time-org-$org-transaction-$transaction-round-$round
+        date '+%M %s %N' >> .$path/initial-time-org-$org-transaction-$(($transaction*16))-round-$round
 
 		#printf "\n executando transacoes"
         # executar o script
@@ -55,7 +57,7 @@ do
         while [ $finish -gt 1 ]; do
             finish=$(ps aux | grep send_transactions.sh | wc -l)
         done
-        echo "Finish: $(date '+%M %s %N')" >> .$path/initial-time-org-$org-transaction-$transaction-round-$round
+        echo "Finish: $(date '+%M %s %N')" >> .$path/initial-time-org-$org-transaction-$(($transaction*16))-round-$round
 	
 		#printf "\n mimiu again"
 		# dormir esperando o resultado

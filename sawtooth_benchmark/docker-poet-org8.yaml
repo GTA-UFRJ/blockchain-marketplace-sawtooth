@@ -156,6 +156,7 @@ services:
         sawtooth keygen && \
         tail -f /dev/null \
         \""
+
   shell-14:
     image: hyperledger/sawtooth-shell:chime
     container_name: sawtooth-shell-default-14

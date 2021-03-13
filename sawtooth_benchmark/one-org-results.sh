@@ -21,9 +21,11 @@ mkdir .$path
 
 for round in $(seq 1 $rounds); 
 do
+	echo "Starting round $round for client scalability test"
 	for client in 1 2 4 8 16 32; 
 	do #4 8 16 32 64 do
 
+		echo "$client client(s)"
 		#printf "\n round $k start for $i clis start"	
 		# levantar a rede
 		docker-compose -f docker-poet-$client.yaml up -d >> /dev/null 2>&1 &
