@@ -18,7 +18,7 @@ Entity 8 = (15.28 pm 2.12) txns/sec
 Entity 16 = (20.22 pm 4.73) txns/sec
 Entity 32 = (20.04 pm 1.62) txns/sec
 
-Scalability with 16 clients and 2 tps (50 * 16):
+16 clients and 2 tps (50 * 16):
 
 ----------poet-scalab----------
 Entity 2 = (0 pm 0) txns/sec
@@ -33,15 +33,6 @@ Entity 4 = (21.18 pm 1.47) txns/sec
 Entity 6 = (20.87 pm 0.41) txns/sec
 Entity 8 = (19.42 pm 0.73) txns/sec
 Entity 10 = (18.03 pm 1.08) txns/sec
-
-
-
-
-
-
-
-
-
 
 Distributed transaction emitting (240):
 

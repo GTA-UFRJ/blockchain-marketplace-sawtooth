@@ -6,7 +6,7 @@ rounds=$1
 transaction=200
 cmd="/binary/autavail-go register 123456 --url="http://sawtooth-rest-api-default-0:8008""
 
-docker-compose -f docker-pbft-org8.yaml down --remove-orphans -v >> /dev/null 2>&1
+docker-compose -f docker-poet-org8.yaml down --remove-orphans -v >> /dev/null 2>&1
 #docker-compose -f docker-pbft-org8.yaml down --remove-orphans -v
 sleep 10
 
@@ -17,7 +17,7 @@ sleep 10
 #	mv .$path/* $backup
 #fi
 
-path="/scripts/results/pbft-scalab-results-$(date '+%F-%H-%M-%S')"
+path="/scripts/results/poet-scalab-results-$(date '+%F-%H-%M-%S')"
 mkdir .$path
 
 for round in $(seq 1 $rounds); 
@@ -27,7 +27,7 @@ do
 
 		#printf "\n round $round start for $i clis start"	
 		# levantar a rede
-		docker-compose -f docker-pbft-org$org.yaml up -d >> /dev/null 2>&1 &
+		docker-compose -f docker-poet-org$org.yaml up -d >> /dev/null 2>&1 &
 		#docker-compose -f docker-pbft-org$org.yaml up -d
 		
 		#printf "\n mimiu"
@@ -54,7 +54,7 @@ do
 		# dormir esperando o resultado
 		sleep $((25+$org))
 	
-		docker-compose -f docker-pbft-org$org.yaml down -v --remove-orphans >> /dev/null 2>&1 &
+		docker-compose -f docker-peot-org$org.yaml down -v --remove-orphans >> /dev/null 2>&1 &
 		#docker-compose -f docker-pbft-org$org.yaml down -v --remove-orphans >> /dev/null 2>&1
 		sleep $((10+$org))
 	done;

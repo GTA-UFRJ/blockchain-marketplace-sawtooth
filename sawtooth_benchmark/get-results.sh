@@ -14,9 +14,9 @@ else
 	echo "No last results found"
 fi
 echo "Starting PoET scalability test"
-bash ./poet-scalab-results_3.sh $rounds
+bash ./poet-scalab-results.sh $rounds
 echo "Starting PBFT scalability test"
-bash ./pbft-scalab-results_3.sh $rounds
+bash ./pbft-scalab-results.sh $rounds
 echo "Starting clients scalability test"
 #bash ./one-org-results.sh $rounds
 #bash ./data-processing/compute-results.sh
