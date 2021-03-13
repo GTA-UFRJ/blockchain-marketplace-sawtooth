@@ -42,7 +42,7 @@ do
 		# executar o script
 		for i in $(seq 0 $(($client-1)));
 		do
-			sleep 0.1 ; docker exec sawtooth-shell-default-$i ./scripts/send_transactions.sh $path $transaction $client 3 & 	
+			sleep 0.1 ; docker exec sawtooth-shell-default-$i ./scripts/send_transactions.sh $path $transaction $client 2 & 	
 		done
 		
 		#printf "\n ta na hora do query"

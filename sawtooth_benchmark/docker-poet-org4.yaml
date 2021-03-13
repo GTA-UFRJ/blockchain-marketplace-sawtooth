@@ -47,6 +47,138 @@ services:
         sawtooth keygen && \
         tail -f /dev/null \
         \""
+
+  shell-4:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-4
+    volumes:
+      - ./scripts:/scripts
+      - ./binary:/binary
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \""
+
+  shell-5:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-5
+    volumes:
+      - ./scripts:/scripts
+      - ./binary:/binary
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \""
+
+  shell-6:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-6
+    volumes:
+      - ./scripts:/scripts
+      - ./binary:/binary
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \""
+
+  shell-7:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-7
+    volumes:
+      - ./scripts:/scripts
+      - ./binary:/binary
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \""
+
+  shell-8:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-8
+    volumes:
+      - ./scripts:/scripts
+      - ./binary:/binary
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \""
+
+  shell-9:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-9
+    volumes:
+      - ./scripts:/scripts
+      - ./binary:/binary
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \""
+
+  shell-10:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-10
+    volumes:
+      - ./scripts:/scripts
+      - ./binary:/binary
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \""
+
+  shell-11:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-11
+    volumes:
+      - ./scripts:/scripts
+      - ./binary:/binary
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \""
+
+  shell-12:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-12
+    volumes:
+      - ./scripts:/scripts
+      - ./binary:/binary
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \""
+
+  shell-13:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-13
+    volumes:
+      - ./scripts:/scripts
+      - ./binary:/binary
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \""
+
+  shell-14:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-14
+    volumes:
+      - ./scripts:/scripts
+      - ./binary:/binary
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \""
+
+  shell-15:
+    image: hyperledger/sawtooth-shell:chime
+    container_name: sawtooth-shell-default-15
+    volumes:
+      - ./scripts:/scripts
+      - ./binary:/binary
+    entrypoint: "bash -c \"\
+        sawtooth keygen && \
+        tail -f /dev/null \
+        \""
   
   validator-0:
     image: hyperledger/sawtooth-validator:chime
