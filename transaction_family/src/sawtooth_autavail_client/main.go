@@ -42,6 +42,7 @@ func main() {
 		&Buy{},
 		&List{},
 		&Register{},
+		&Batch{},
 	}
 
 	// Apply the Register method to all parser sub-commands, i.e. Advert.Register (advert.go)

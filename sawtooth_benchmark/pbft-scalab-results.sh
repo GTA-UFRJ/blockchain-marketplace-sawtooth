@@ -37,14 +37,14 @@ do
 		docker exec sawtooth-shell-default-0 $cmd
 		sleep 1
 
-        #gera workload
-        docker exec sawtooth-shell-default-0 /scripts/generate-workload.sh $transaction
+    #gera workload
+    docker exec sawtooth-shell-default-0 /scripts/generate-workload.sh $transaction
 
-        # marcar o tempo
-        date '+%M %s %N' >> .$path/initial-time-org-$org-transaction-$transaction-round-$round
+    # marcar o tempo
+    date '+%M %s %N' >> .$path/initial-time-org-$org-transaction-$transaction-round-$round
 
-        #  envia transacoes
-        docker exec sawtooth-shell-default-0 sawtooth batch submit -f autavail.workload --url http://sawtooth-rest-api-default-0:8008 &
+    #  envia transacoes
+    docker exec sawtooth-shell-default-0 sawtooth batch submit -f autavail.workload --url http://sawtooth-rest-api-default-0:8008 &
 
 		#printf "\n ta na hora do query"
 		# consultar transações

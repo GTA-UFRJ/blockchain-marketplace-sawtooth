@@ -22,6 +22,12 @@ if(sys.argv[1]=="pbft-scalab"):
 	ENTITY_TYPE = "org"
 	TRANSACTIONS = 200
 
+if(sys.argv[1]=="batch"):
+        ROUNDS = 10
+        ENTITY_LIST = [1, 2, 5, 10]
+        ENTITY_TYPE = "txperbatch"
+        TRANSACTIONS = 200
+
 def CalculateRoundThrowput (roundCount, entity):
 	
 	# Read time log file content

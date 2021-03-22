@@ -75,7 +75,23 @@ func (autavailClient AutavailClient) Advert(
   txtype string, txid string, price string, ipaddr string, orgid string, title string, description string, datatype string) (string, error) {
   adverttxid := ""
 	advertorgid := ""
-  return autavailClient.sendTransaction(txtype, txid, adverttxid, advertorgid, price, ipaddr, orgid, title, description, datatype)
+
+	// Get transaction
+	transaction, err := autavailClient.createTransaction(
+	txtype, txid, adverttxid, advertorgid, price, ipaddr, orgid, title, description, datatype)
+	if err != nil {
+    return "", err
+  }
+
+	// Get BatchList with one transaction
+  rawBatchList, err := autavailClient.createBatchList(
+          []*transaction_pb2.Transaction{&transaction})
+  if err != nil {
+    return "", errors.New(fmt.Sprintf("Unable to construct batch list: %v", err))
+  }
+
+	// Send transaction
+	return autavailClient.sendTransactions(rawBatchList, txid)
 }
 
 func (autavailClient AutavailClient) Buy(
@@ -84,7 +100,23 @@ func (autavailClient AutavailClient) Buy(
   title := ""
   description := ""
   datatype := ""
-  return autavailClient.sendTransaction(txtype, txid, adverttxid, advertorgid, price, ipaddr, orgid, title, description, datatype)
+
+	// Get transaction
+	transaction, err := autavailClient.createTransaction(
+  txtype, txid, adverttxid, advertorgid, price, ipaddr, orgid, title, description, datatype)
+  if err != nil {
+    return "", err
+  }
+
+	// Get BatchList with one transaction
+  rawBatchList, err := autavailClient.createBatchList(
+          []*transaction_pb2.Transaction{&transaction})
+  if err != nil {
+    return "", errors.New(fmt.Sprintf("Unable to construct batch list: %v", err))
+  }
+
+	// Send transaction
+	return autavailClient.sendTransactions(rawBatchList, txid)
 }
 
 /*
@@ -181,7 +213,57 @@ func (autavailClient AutavailClient) Register(
   title := ""
   description := ""
   datatype := ""
-  return autavailClient.sendTransaction(txtype, txid, adverttxid, advertorgid, price, ipaddr, orgid, title, description, datatype)
+
+	// Get transaction
+	transaction, err := autavailClient.createTransaction(
+  txtype, txid, adverttxid, advertorgid, price, ipaddr, orgid, title, description, datatype)
+  if err != nil {
+    return "", err
+  }
+
+	// Get BatchList
+  rawBatchList, err := autavailClient.createBatchList(
+          []*transaction_pb2.Transaction{&transaction})
+  if err != nil {
+    return "", errors.New(fmt.Sprintf("Unable to construct batch list: %v", err))
+  }
+
+	// Send transaction
+	return autavailClient.sendTransactions(rawBatchList, txid)
+}
+
+func (autavailClient AutavailClient) Batch (txidList []string, orgid string) (string, error) {
+	txtype := "advert"
+	adverttxid := ""
+  advertorgid := ""
+	price := "10"
+	ipaddr := "10.0.0.1"
+	title := "title"
+	description := "description"
+	datatype := "datatype"
+
+	var transactionList []*transaction_pb2.Transaction
+
+	for _, txid := range txidList {
+		// Get transaction
+		transaction, err := autavailClient.createTransaction(
+		txtype, txid, adverttxid, advertorgid, price, ipaddr, orgid, title, description, datatype)
+		if err != nil {
+			return "", err
+		}
+
+		// Append transactions in a list
+		transactionList = append(transactionList, &transaction)
+	}
+
+	// Get BatchList
+  rawBatchList, err := autavailClient.createBatchList(transactionList)
+  if err != nil {
+    return "", errors.New(fmt.Sprintf("Unable to construct batch list: %v", err))
+  }
+
+	// Send transaction
+  return autavailClient.sendTransactions(rawBatchList, "")
 }
 
 // Makes a HTTP request to the validator throw the REST API and returns response body
@@ -226,8 +308,8 @@ func (autavailClient AutavailClient) sendRequest(
   return string(reponseBody), nil
 }
 
-// Encode payload, build transaction, wrap transaction in bacth, send batch, return HTTP response and error
-func (autavailClient AutavailClient) sendTransaction(
+// Encode payload, build transaction
+func (autavailClient AutavailClient) createTransaction(
 	txtype string,
 	txid string,
 	adverttxid string,
@@ -237,7 +319,7 @@ func (autavailClient AutavailClient) sendTransaction(
 	orgid string,
 	title string,
 	description string,
-	datatype string) (string, error) {
+	datatype string) (transaction_pb2.Transaction, error) {
 
 	// Payload: <txtype>:<txid>:<adverttxid>:<price>:<ipaddr>:<orgid>:<title>:<description>:<datatype>
 	payload := fmt.Sprintf("%s:%s:%s:%s:%s:%s:%s:%s:%s:%s",
@@ -271,7 +353,7 @@ func (autavailClient AutavailClient) sendTransaction(
 	// Serialize (marshall) in protocol buffer (Google Protobuf)
 	transactionHeader, err := proto.Marshal(&rawTransactionHeader)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("Unable to serialize transaction header: %v", err))
+		return transaction_pb2.Transaction{}, errors.New(fmt.Sprintf("Unable to serialize transaction header: %v", err))
 	}
 
 	// Signature of transaction header
@@ -284,13 +366,11 @@ func (autavailClient AutavailClient) sendTransaction(
 		HeaderSignature:  transactionHeaderSignature,
 		Payload:          []byte(payload),
 	}
+	return transaction, nil
+}
 
-	// Get BatchList
-	rawBatchList, err := autavailClient.createBatchList(
-					[]*transaction_pb2.Transaction{&transaction})
-	if err != nil {
-		return "", errors.New(fmt.Sprintf("Unable to construct batch list: %v", err))
-	}
+// Send batch, return HTTP response and error
+func (autavailClient AutavailClient) sendTransactions(rawBatchList batch_pb2.BatchList, txid string) (string, error){
 
 	// Serialize batch list
 	// batchId := rawBatchList.Batches[0].HeaderSignature
