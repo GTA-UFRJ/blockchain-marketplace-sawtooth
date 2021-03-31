@@ -9,7 +9,7 @@ fi
 #python3 ./compute-results.py one-org
 #rm ./*-time-*
 
-echo "batch"
+echo "batch:"
 cp ../scripts/results/batch-*/* .
 python3 ./compute-results.py batch
 rm ./*-time-*
@@ -22,6 +22,16 @@ rm ./*-time-*
 echo "pbft scalab:"
 cp ../scripts/results/pbft-scalab-*/* .
 python3 ./compute-results.py pbft-scalab
+rm ./*-time-*
+
+echo "serial:"
+cp ../scripts/results/serial-*/* .
+python3 ./compute-results.py serial
+rm ./*-time-*
+
+echo "parallel:"
+cp ../scripts/results/parallel-*/* .
+python3 ./compute-results.py parallel
 rm ./*-time-*
 
 cp ./results.log ..

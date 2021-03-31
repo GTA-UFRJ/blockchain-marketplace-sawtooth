@@ -23,10 +23,22 @@ if(sys.argv[1]=="pbft-scalab"):
 	TRANSACTIONS = 200
 
 if(sys.argv[1]=="batch"):
-        ROUNDS = 10
-        ENTITY_LIST = [1, 2, 5, 10]
-        ENTITY_TYPE = "txperbatch"
-        TRANSACTIONS = 200
+	ROUNDS = 10
+	ENTITY_LIST = [1, 2, 5, 10, 20, 50, 100, 200]
+	ENTITY_TYPE = "txperbatch"
+	TRANSACTIONS = 200
+
+if(sys.argv[1]=="serial"):
+    ROUNDS = 20
+    ENTITY_LIST = [1]
+    ENTITY_TYPE = "txperbatch"
+    TRANSACTIONS = 200
+
+if(sys.argv[1]=="parallel"):
+    ROUNDS = 20
+    ENTITY_LIST = [1]
+    ENTITY_TYPE = "txperbatch"
+    TRANSACTIONS = 200
 
 def CalculateRoundThrowput (roundCount, entity):
 	
@@ -61,6 +73,8 @@ def CalculateRoundThrowput (roundCount, entity):
 	else:
 		if (ENTITY_TYPE=="org"):
 			realTransaction = TRANSACTIONS
+		elif (ENTITY_TYPE=="txperbatch"):
+			realTransaction = TRANSACTIONS
 		else:
 			realTransaction = TRANSACTIONS * entity
 		initialTime = int(initialTimeFileLines[0].split(" ")[1])
@@ -71,13 +85,19 @@ def CalculateRoundThrowput (roundCount, entity):
 	#initialTime = 12345675
 	
 	# Calculate throwput
+	# (TRANSACTIONS/5)
+	# ((TRANSACTIONS * entity)/5)
 	if (ENTITY_TYPE=="org"):
+		if (realTransaction < (TRANSACTIONS/5)):
+			return -1
+	elif (ENTITY_TYPE=="txperbatch"):
 		if (realTransaction < (TRANSACTIONS/5)):
 			return -1
 	else:
 		if (realTransaction < ((TRANSACTIONS * entity)/5)):
 			return -1
-	return realTransaction / (finalTime - initialTime)
+	return (realTransaction-1) / (finalTime - initialTime)
+	#return (realTransaction) / (finalTime - initialTime)
 
 def LoopThrowRounds (entity):
 

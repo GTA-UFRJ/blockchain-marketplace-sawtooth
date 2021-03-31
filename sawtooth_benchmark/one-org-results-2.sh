@@ -18,12 +18,12 @@ sleep 30
 #	mv .$path/* $backup
 #fi
 
-path="/scripts/results/one-org-results-txperbatchbatch-$txperbatch-$(date '+%F-%H-%M-%S')"
+path="/scripts/results/one-org-results-txperbatch-$txperbatch-$(date '+%F-%H-%M-%S')"
 mkdir .$path
 
 for round in $(seq 1 $rounds); 
 do
-	echo "Starting round $round for client scalability test"
+	echo "Starting round $round for batch test"
 	for client in 1 2 4 8 16 32; 
 	do #4 8 16 32 64 do
 

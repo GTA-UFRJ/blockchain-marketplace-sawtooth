@@ -188,7 +188,7 @@ services:
 
   shell-13:
     image: hyperledger/sawtooth-shell:chime
-    container_name: sawtooth-shell-default-9
+    container_name: sawtooth-shell-default-13
     volumes:
       - pbft-shared:/pbft-shared
       - ./scripts:/scripts
