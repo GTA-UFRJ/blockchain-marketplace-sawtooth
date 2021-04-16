@@ -3,7 +3,7 @@
 rounds=$1
 
 #path=/scripts/results
-transaction=200
+transaction=300
 cmd1="/binary/v2/autavail-go-v2 register 123456 --url="http://sawtooth-rest-api-default-0:8008""
 cmd2="/binary/v2/autavail-go-v2 advert 100 123456 title description 10.0.0.1 datatype --url="http://sawtooth-rest-api-default-0:8008""
 cmd3="/binary/v2/autavail-go-v2 list --url="http://sawtooth-rest-api-default-0:8008""
@@ -25,10 +25,10 @@ mkdir .$path
 for round in $(seq 1 $rounds); 
 do
 	echo "Round $round"
-	#printf "\n round $round start for $i clis start"	
-	# levantar a rede
-	docker-compose -f docker-poet-1-serial.yaml up -d >> /dev/null 2>&1 &
-	#docker-compose -f docker-poet-1.yaml up -d
+    #printf "\n round $round start for $i clis start"
+    # levantar a rede
+    docker-compose -f docker-poet-1-serial.yaml up -d >> /dev/null 2>&1 &
+    #docker-compose -f docker-poet-1.yaml up -d
 		
 	#printf "\n mimiu"
 	# dormir esperando a rede levantar
@@ -44,6 +44,8 @@ do
     #gera workload
    	docker exec sawtooth-shell-default-0 /scripts/generate-workload-4.sh $transaction $adverttxid
 
+	#docker logs sawtooth-validator-default-0
+
     # marcar o tempo
    	date '+%M %s %N' >> .$path/initial-time-txperbatch-1-transaction-$transaction-round-$round
 
@@ -56,8 +58,9 @@ do
 	
 	#printf "\n mimiu again"
 	# dormir esperando o resultado
-	sleep 200
-	
+	sleep 50
+	docker logs sawtooth-validator-default-0	
+
 	docker-compose -f docker-poet-1-serial.yaml down -v --remove-orphans >> /dev/null 2>&1 &
 	#docker-compose -f docker-poet-1.yaml down -v --remove-orphans
 	sleep 30

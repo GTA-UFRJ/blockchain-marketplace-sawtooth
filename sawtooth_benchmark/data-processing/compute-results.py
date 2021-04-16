@@ -29,16 +29,16 @@ if(sys.argv[1]=="batch"):
 	TRANSACTIONS = 200
 
 if(sys.argv[1]=="serial"):
-    ROUNDS = 20
+    ROUNDS = 10
     ENTITY_LIST = [1]
     ENTITY_TYPE = "txperbatch"
-    TRANSACTIONS = 200
+    TRANSACTIONS = 300
 
 if(sys.argv[1]=="parallel"):
-    ROUNDS = 20
+    ROUNDS = 10
     ENTITY_LIST = [1]
     ENTITY_TYPE = "txperbatch"
-    TRANSACTIONS = 200
+    TRANSACTIONS = 300
 
 def CalculateRoundThrowput (roundCount, entity):
 	

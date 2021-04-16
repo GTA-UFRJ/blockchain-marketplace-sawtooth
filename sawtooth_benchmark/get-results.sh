@@ -2,7 +2,7 @@
 
 exec &> logfile.txt
 
-rounds=20
+rounds=10
 echo "$rounds rounds defined"
 
 #faz backup dos resultados atuais antes de pegar os proximos
@@ -21,6 +21,11 @@ echo "Starting serial scheduler test"
 bash ./scheduler-results-serial.sh $rounds
 echo "Starting parallel scheduler test"
 bash ./scheduler-results-parallel.sh $rounds
+echo "Starting serial scheduler test ad"
+bash ./scheduler-results-serial-ad.sh $rounds
+echo "Starting parallel scheduler test ad"
+bash ./scheduler-results-parallel-ad.sh $rounds
+
 
 #bash ./data-processing/compute-results.sh
 #cp ./data-processing/results.log ..

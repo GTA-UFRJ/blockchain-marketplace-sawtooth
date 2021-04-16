@@ -5,7 +5,7 @@ TIME_CONTROL=0
 PREVIOUS_TRANSACTION_NUMBER=0
 while [ $VALIDATED_TRANSACTIONS -lt $2 ]
 do
-	VALIDATED_TRANSACTIONS=$(( $(sawtooth transaction list --url http://sawtooth-rest-api-default-0:8008 | wc -l) - 12 ))
+	VALIDATED_TRANSACTIONS=$(( $(sawtooth transaction list --url http://sawtooth-rest-api-default-0:8008 | wc -l) - 8 ))
 	FLAG_WAIT_TIME=0
 	if [ $VALIDATED_TRANSACTIONS -eq $PREVIOUS_TRANSACTION_NUMBER ]; then 
 		TIME_CONTROL=$((TIME_CONTROL+1))

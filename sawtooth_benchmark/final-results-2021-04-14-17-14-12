@@ -27,9 +27,9 @@ Entity 10 = (0 pm 0) txns/sec
 
 
 ----------serial----------
-Entity 1 = (26.89 pm 14.77) txns/sec
+Entity 1 = (13.14 pm 4.3) txns/sec
 
 
 ----------parallel----------
-Entity 1 = (30.13 pm 14.37) txns/sec
+Entity 1 = (14.32 pm 6.32) txns/sec
 
