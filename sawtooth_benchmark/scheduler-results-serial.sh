@@ -1,6 +1,7 @@
 #!/bin/bash
 
 rounds=$1
+file=$2
 
 #path=/scripts/results
 transaction=300
@@ -8,7 +9,8 @@ cmd1="/binary/v2/autavail-go-v2 register 123456 --url="http://sawtooth-rest-api-
 cmd2="/binary/v2/autavail-go-v2 advert 100 123456 title description 10.0.0.1 datatype --url="http://sawtooth-rest-api-default-0:8008""
 cmd3="/binary/v2/autavail-go-v2 list --url="http://sawtooth-rest-api-default-0:8008""
 
-docker-compose -f docker-poet-1-serial.yaml down --remove-orphans -v >> /dev/null 2>&1
+docker-compose -f $file down --remove-orphans -v >> /dev/null 2>&1
+#docker-compose -f docker-poet-1-serial.yaml down --remove-orphans -v >> /dev/null 2>&1
 #docker-compose -f docker-poet-1.yaml down --remove-orphans -v
 sleep 10
 
@@ -27,7 +29,7 @@ do
 	echo "Round $round"
     #printf "\n round $round start for $i clis start"
     # levantar a rede
-    docker-compose -f docker-poet-1-serial.yaml up -d >> /dev/null 2>&1 &
+    docker-compose -f $file up -d >> /dev/null 2>&1 &
     #docker-compose -f docker-poet-1.yaml up -d
 		
 	#printf "\n mimiu"
@@ -61,7 +63,7 @@ do
 	sleep 50
 	docker logs sawtooth-validator-default-0	
 
-	docker-compose -f docker-poet-1-serial.yaml down -v --remove-orphans >> /dev/null 2>&1 &
+	docker-compose -f $file down -v --remove-orphans >> /dev/null 2>&1 &
 	#docker-compose -f docker-poet-1.yaml down -v --remove-orphans
 	sleep 30
 done

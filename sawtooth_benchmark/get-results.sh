@@ -13,19 +13,33 @@ if [ "$(ls -A ./scripts/results/)" ]; then
 else
 	echo "No last results found"
 fi
-#echo "Starting PoET scalability test"
-#bash ./poet-scalab-results.sh $rounds
-#echo "Starting PBFT scalability test"
-#bash ./pbft-scalab-results.sh $rounds
-echo "Starting serial scheduler test"
-bash ./scheduler-results-serial.sh $rounds
-echo "Starting parallel scheduler test"
-bash ./scheduler-results-parallel.sh $rounds
-echo "Starting serial scheduler test ad"
-bash ./scheduler-results-serial-ad.sh $rounds
-echo "Starting parallel scheduler test ad"
-bash ./scheduler-results-parallel-ad.sh $rounds
 
+echo "Starting serial scheduler test PBFT"
+bash ./scheduler-results.sh $rounds docker-pbft-org5-serial.yaml
+echo "Starting parallel scheduler test PBFT"
+bash ./scheduler-results.sh $rounds docker-pbft-org5-parallel.yaml
+echo "Starting serial scheduler test ad PBFT"
+bash ./scheduler-results-ad.sh $rounds docker-pbft-org5-serial.yaml
+echo "Starting parallel scheduler test ad PBFT"
+bash ./scheduler-results-ad.sh $rounds docker-pbft-org5-parallel.yaml
+
+echo "Starting serial scheduler test PoET simulator"
+bash ./scheduler-results.sh $rounds docker-poet-org5-serial.yaml
+echo "Starting parallel scheduler test PoET simulator"
+bash ./scheduler-results.sh $rounds docker-poet-org5-parallel.yaml
+echo "Starting serial scheduler test ad PoET simulator"
+bash ./scheduler-results-ad.sh $rounds docker-poet-org5-serial.yaml
+echo "Starting parallel scheduler test ad PoET simulator"
+bash ./scheduler-results-ad.sh $rounds docker-poet-org5-parallel.yaml
+
+#echo "Starting serial scheduler test PoET SGX"
+#bash ./scheduler-results.sh $rounds docker-sgx-org5-serial.yaml
+#echo "Starting parallel scheduler test PoET SGX"
+#bash ./scheduler-results.sh $rounds docker-sgx-org5-parallel.yaml
+#echo "Starting serial scheduler test ad PoET SGX"
+#bash ./scheduler-results-ad.sh $rounds docker-sgx-org5-serial.yaml
+#echo "Starting parallel scheduler test ad PoET SGX"
+#bash ./scheduler-results-ad.sh $rounds docker-sgx-org5-parallel.yaml
 
 #bash ./data-processing/compute-results.sh
 #cp ./data-processing/results.log ..
