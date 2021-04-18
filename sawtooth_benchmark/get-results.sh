@@ -23,14 +23,14 @@ bash ./scheduler-results-ad.sh $rounds docker-pbft-org5-serial.yaml
 echo "Starting parallel scheduler test ad PBFT"
 bash ./scheduler-results-ad.sh $rounds docker-pbft-org5-parallel.yaml
 
-echo "Starting serial scheduler test PoET simulator"
-bash ./scheduler-results.sh $rounds docker-poet-org5-serial.yaml
-echo "Starting parallel scheduler test PoET simulator"
-bash ./scheduler-results.sh $rounds docker-poet-org5-parallel.yaml
-echo "Starting serial scheduler test ad PoET simulator"
-bash ./scheduler-results-ad.sh $rounds docker-poet-org5-serial.yaml
-echo "Starting parallel scheduler test ad PoET simulator"
-bash ./scheduler-results-ad.sh $rounds docker-poet-org5-parallel.yaml
+#echo "Starting serial scheduler test PoET simulator"
+#bash ./scheduler-results.sh $rounds docker-poet-org5-serial.yaml
+#echo "Starting parallel scheduler test PoET simulator"
+#bash ./scheduler-results.sh $rounds docker-poet-org5-parallel.yaml
+#echo "Starting serial scheduler test ad PoET simulator"
+#bash ./scheduler-results-ad.sh $rounds docker-poet-org5-serial.yaml
+#echo "Starting parallel scheduler test ad PoET simulator"
+#bash ./scheduler-results-ad.sh $rounds docker-poet-org5-parallel.yaml
 
 #echo "Starting serial scheduler test PoET SGX"
 #bash ./scheduler-results.sh $rounds docker-sgx-org5-serial.yaml
