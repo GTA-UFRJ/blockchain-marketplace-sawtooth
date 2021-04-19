@@ -56,7 +56,8 @@ do
 
 	#printf "\n ta na hora do query"
 	# consultar transações
-	docker exec sawtooth-shell-default-0 /scripts/query-3.sh $path $transaction 1 $round &
+	./scripts/query-4.sh $path $transaction 1 $round &
+	#docker exec sawtooth-shell-default-0 /scripts/query-3.sh $path $transaction 1 $round &
 	
 	#printf "\n mimiu again"
 	# dormir esperando o resultado
