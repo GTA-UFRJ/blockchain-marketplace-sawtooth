@@ -29,7 +29,6 @@ do
     docker-compose -f $file up -d >> /dev/null 2>&1 &
     #docker-compose -f docker-poet-1.yaml up -d
 
-		
 	#printf "\n mimiu"
 	# dormir esperando a rede levantar
 	sleep 20
@@ -43,23 +42,36 @@ do
 
     #gera workload
    	docker exec sawtooth-shell-default-0 /scripts/generate-workload.sh $transaction
+	docker exec sawtooth-shell-default-0 mv autavail.workload autavail.workload-1
+        docker exec sawtooth-shell-default-0 /scripts/generate-workload.sh $transaction
+        docker exec sawtooth-shell-default-0 mv autavail.workload autavail.workload-2
+        docker exec sawtooth-shell-default-0 /scripts/generate-workload.sh $transaction
+        docker exec sawtooth-shell-default-0 mv autavail.workload autavail.workload-3
+        docker exec sawtooth-shell-default-0 /scripts/generate-workload.sh $transaction
+        docker exec sawtooth-shell-default-0 mv autavail.workload autavail.workload-4
 
 	#docker logs sawtooth-validator-default-0
 
     # marcar o tempo
-   	date '+%M %s %N' >> .$path/initial-time-txperbatch-1-transaction-$transaction-round-$round
+    date '+%M %s %N' >> .$path/initial-time-txperbatch-1-transaction-$(($transaction*4))-round-$round
 
     #  envia transacoes
-   	docker exec sawtooth-shell-default-0 sawtooth batch submit -f autavail.workload --url http://sawtooth-rest-api-default-0:8008 &
+    	./scripts/query-4.sh $path $(($transaction*4)) 1 $round &
+   	docker exec sawtooth-shell-default-0 sawtooth batch submit -f autavail.workload-1 --url http://sawtooth-rest-api-default-0:8008
+	sleep 1
+        docker exec sawtooth-shell-default-0 sawtooth batch submit -f autavail.workload-2 --url http://sawtooth-rest-api-default-0:8008
+        sleep 1
+        docker exec sawtooth-shell-default-0 sawtooth batch submit -f autavail.workload-3 --url http://sawtooth-rest-api-default-0:8008
+        sleep 1
+        docker exec sawtooth-shell-default-0 sawtooth batch submit -f autavail.workload-4 --url http://sawtooth-rest-api-default-0:8008 &
 
 	#printf "\n ta na hora do query"
 	# consultar transações
-	./scripts/query-4.sh $path $transaction 1 $round &
 	#docker exec sawtooth-shell-default-0 /scripts/query-3.sh $path $transaction 1 $round &
 	
 	#printf "\n mimiu again"
 	# dormir esperando o resultado
-	sleep 50
+	sleep 80
 	docker logs sawtooth-validator-default-0
 	
 	docker-compose -f $file down -v --remove-orphans >> /dev/null 2>&1 &

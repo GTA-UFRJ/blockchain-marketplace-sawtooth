@@ -21,4 +21,7 @@ do
 	sleep 1
 done
 date '+%M %s %N' >> .$1/final-time-txperbatch-$3-transaction-$2-round-$4
+sleep 3
+docker exec -t sawtooth-validator-default-0 du /var/lib/sawtooth >> ./blockchain-size
+sleep 1
 echo "next" >> ./blockchain-size
