@@ -132,6 +132,14 @@ func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, cont
 		description,
 		dataType)
 
+		assetPrtice, err := strconv.ParseFloat(price,32)
+		if err != nil {
+			return err
+		}
+		if ipAddress == "slow" {
+			time.Sleep(assetPrice * time.Second)
+		}
+
 		// Apply advertisement transaction
 		addresses, err := context.SetState(map[string][]byte{
 			advertAddress: []byte(advertStateData),
@@ -227,6 +235,10 @@ func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, cont
 		// Construct state organizations string
 		buyOrgStateData := fmt.Sprintf("%s:%f", orgID, buyerBalance)
 		advertOrgStateData := fmt.Sprintf("%s:%f", advertisementOrgID, sellerBalance)
+
+		if ipAddress == "slow" {
+                        time.Sleep(assetPrice * time.Second)
+                }
 
 		// Apply buy transaction
 		addresses, err := context.SetState(map[string][]byte{

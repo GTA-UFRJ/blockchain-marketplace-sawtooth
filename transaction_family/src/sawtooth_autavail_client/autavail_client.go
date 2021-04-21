@@ -17,7 +17,7 @@ import (
   "protobuf/transaction_pb2"
   "strconv"
   "strings"
-	"os"
+  "os"
 )
 
 type AutavailClient struct {
@@ -235,7 +235,7 @@ func (autavailClient AutavailClient) Register(
 func (autavailClient AutavailClient) Batch (txidList []string, orgid string) (string, error) {
 	txtype := "advert"
 	adverttxid := ""
-  advertorgid := ""
+	advertorgid := ""
 	price := "10"
 	ipaddr := "10.0.0.1"
 	title := "title"
@@ -393,6 +393,8 @@ func (autavailClient AutavailClient) sendTransactions(rawBatchList batch_pb2.Bat
     }
 		return "Write into autavail.workload file", nil
 	}
+
+	fmt.Println(txid)
 
 	// Submmit batch list throw HTTP
 	return autavailClient.sendRequest(BATCH_SUBMIT_API, batchList, CONTENT_TYPE_OCTET_STREAM, txid)

@@ -46,7 +46,7 @@ do
     #gera workload
    	docker exec sawtooth-shell-default-0 /scripts/generate-workload-4.sh $transaction $adverttxid
 	docker exec sawtooth-shell-default-0 mv autavail.workload autavail.workload-1
-	docker exec sawtooth-shell-default-0 /scripts/generate-workload-4.sh $transaction $adverttxid
+	docker exec sawtooth-shell-default-0 /scripts/generate-workload-4.sh $transaction $adverttxid 
         docker exec sawtooth-shell-default-0 mv autavail.workload autavail.workload-2
 	docker exec sawtooth-shell-default-0 /scripts/generate-workload-4.sh $transaction $adverttxid
         docker exec sawtooth-shell-default-0 mv autavail.workload autavail.workload-3
