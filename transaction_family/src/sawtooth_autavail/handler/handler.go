@@ -9,6 +9,7 @@ import (
 	"protobuf/processor_pb2"
 	"strings"
 	"strconv"
+	"time"
 )
 
 const (
@@ -132,12 +133,12 @@ func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, cont
 		description,
 		dataType)
 
-		assetPrtice, err := strconv.ParseFloat(price,32)
+		assetPrice, err := strconv.ParseFloat(price,32)
 		if err != nil {
 			return err
 		}
 		if ipAddress == "slow" {
-			time.Sleep(assetPrice * time.Second)
+			time.Sleep(time.Duration(assetPrice) * time.Second)
 		}
 
 		// Apply advertisement transaction
@@ -237,7 +238,7 @@ func (self *AutAvailHandler) Apply(request *processor_pb2.TpProcessRequest, cont
 		advertOrgStateData := fmt.Sprintf("%s:%f", advertisementOrgID, sellerBalance)
 
 		if ipAddress == "slow" {
-                        time.Sleep(assetPrice * time.Second)
+                        time.Sleep(time.Duration(assetPrice) * time.Second)
                 }
 
 		// Apply buy transaction
