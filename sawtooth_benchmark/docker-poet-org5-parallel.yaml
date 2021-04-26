@@ -256,7 +256,7 @@ services:
     stop_signal: SIGKILL
 
   autavail-tp-0:
-    image: guilhermeeec/sawtooth-autavail-tp-go:3
+    image: guilhermeeec/sawtooth-autavail-tp-go:4
     container_name: sawtooth-autavail-tp-go-default-0
     expose:
       - 4004
@@ -266,7 +266,7 @@ services:
     stop_signal: SIGKILL
 
   autavail-tp-1:
-    image: guilhermeeec/sawtooth-autavail-tp-go:3
+    image: guilhermeeec/sawtooth-autavail-tp-go:4
     container_name: sawtooth-autavail-tp-go-default-1
     expose:
       - 4004
@@ -276,7 +276,7 @@ services:
     stop_signal: SIGKILL
 
   autavail-tp-2:
-    image: guilhermeeec/sawtooth-autavail-tp-go:3
+    image: guilhermeeec/sawtooth-autavail-tp-go:4
     container_name: sawtooth-autavail-tp-go-default-2
     expose:
       - 4004
@@ -286,7 +286,7 @@ services:
     stop_signal: SIGKILL
 
   autavail-tp-3:
-    image: guilhermeeec/sawtooth-autavail-tp-go:3
+    image: guilhermeeec/sawtooth-autavail-tp-go:4
     container_name: sawtooth-autavail-tp-go-default-3
     expose:
       - 4004
@@ -296,7 +296,7 @@ services:
     stop_signal: SIGKILL
 
   autavail-tp-4:
-    image: guilhermeeec/sawtooth-autavail-tp-go:3
+    image: guilhermeeec/sawtooth-autavail-tp-go:4
     container_name: sawtooth-autavail-tp-go-default-4
     expose:
       - 4004

@@ -24,15 +24,15 @@ if(sys.argv[1]=="pbft-scalab"):
 
 if(sys.argv[1]=="batch"):
     ROUNDS = 10
-    ENTITY_LIST = [1, 2, 5, 10, 20, 50, 100, 200]
+    ENTITY_LIST = [1, 2, 4, 6, 8]
     ENTITY_TYPE = "txperbatch"
-    TRANSACTIONS = 200
+    TRANSACTIONS = 400
 
 if(sys.argv[1]=="serial"):
     ROUNDS = 10
     ENTITY_LIST = [1]
     ENTITY_TYPE = "txperbatch"
-    TRANSACTIONS = 1200
+    TRANSACTIONS = 800
 
 if(sys.argv[1]=="parallel"):
     ROUNDS = 10
@@ -85,6 +85,8 @@ def CalculateRoundThrowput (roundCount, entity):
     #finalTime = 12345678
     #initialTime = 12345675
 	
+    print(entity," ",roundCount," ",str(realTransaction)," ",str(finalTime)," ",str(initialTime))
+    
     # Calculate throwput
     # (TRANSACTIONS/5)
     # ((TRANSACTIONS * entity)/5)
@@ -122,7 +124,7 @@ def LoopThrowRounds (entity):
 	# Calculate mean and standard deviation of throwput for certein number of entities
 	meanThrowput = statistics.mean(throwputsCalculations)
 	stdevThrowput = statistics.pstdev(throwputsCalculations)
-	return round(meanThrowput,2), round(stdevThrowput,2)
+	return round(meanThrowput,5), round(stdevThrowput,5)
 	
 def main ():
 	

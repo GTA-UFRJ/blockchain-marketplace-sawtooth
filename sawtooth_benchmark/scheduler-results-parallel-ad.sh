@@ -3,7 +3,7 @@
 rounds=$1
 
 #path=/scripts/results
-transaction=300
+transaction=200
 cmd1="/binary/v2/autavail-go-v2 register 123456 --url="http://sawtooth-rest-api-default-0:8008""
 
 docker-compose -f docker-poet-1-parallel.yaml down --remove-orphans -v >> /dev/null 2>&1

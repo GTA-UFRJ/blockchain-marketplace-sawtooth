@@ -1,0 +1,36 @@
+
+----------batch----------
+Entity 1 = (0 pm 0) txns/sec
+Entity 2 = (0 pm 0) txns/sec
+Entity 4 = (0 pm 0) txns/sec
+Entity 6 = (0 pm 0) txns/sec
+Entity 8 = (0 pm 0) txns/sec
+
+
+----------poet-scalab----------
+Entity 2 = (0 pm 0) txns/sec
+Entity 4 = (0 pm 0) txns/sec
+Entity 6 = (0 pm 0) txns/sec
+Entity 8 = (0 pm 0) txns/sec
+Entity 10 = (0 pm 0) txns/sec
+
+
+----------pbft-scalab----------
+Entity 2 = (0 pm 0) txns/sec
+Entity 4 = (0 pm 0) txns/sec
+Entity 6 = (0 pm 0) txns/sec
+Entity 8 = (0 pm 0) txns/sec
+Entity 10 = (0 pm 0) txns/sec
+
+
+----------serial----------
+Entity 1 = (53.62 pm 7.39) txns/sec
+Entity 2 = (56.29 pm 7.21) txns/sec
+Entity 4 = (54.86 pm 3.27) txns/sec
+Entity 6 = (59.52 pm 7.73) txns/sec
+Entity 8 = (57.48 pm 5.29) txns/sec
+
+
+----------parallel----------
+Entity 1 = (0 pm 0) txns/sec
+

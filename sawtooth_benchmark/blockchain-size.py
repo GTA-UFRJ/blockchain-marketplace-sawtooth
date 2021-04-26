@@ -27,37 +27,51 @@ def MatrixFill (resultsMatrix):
 def CalculateSize (resultsMatrix):
     roundsAmount = len (resultsMatrix)
     preprocessesdMatrix = MatrixFill (resultsMatrix)
-    
-    # MISSING CODE
-    
-    print(preprocessesdMatrix)
-    return 0, 0
-
+    roundArraySize = len(preprocessesdMatrix[0])
+    meanArray = []
+    deviationArray = []
+    cacheArray = []
+    for index in range(roundArraySize):
+        for roundArray in preprocessesdMatrix:
+            cacheArray.append(roundArray[index])
+        mean = statistics.mean(cacheArray)
+        deviation = 0.62 * statistics.pstdev(cacheArray)
+        meanArray.append(round(mean,2))
+        deviationArray.append(round(deviation,2))
+    #print(preprocessesdMatrix)
+    return meanArray, deviationArray
 
 def main():
     experimentCount = 0
     roundCount = 0
     resultsMatrix = []
     resultsMatrix.append([])
-    f = open("blockchain-size-1","r")
+    f = open("blockchain-size","r")
     lines = f.readlines()
+    index = 0
     for line in lines:
-        if (line[0:8] == 'Starting'):
+        if ((line[0:8] == 'Starting') or ((len(lines)-1) == index)):
             if (experimentCount != 0):
-                resultsMatrix.pop()
+                #resultsMatrix.pop()
                 mean, deviation = CalculateSize (resultsMatrix)
-                print("Experiment ", experimentCount, ": ", str(round(mean,2)), " +- ", str(round(deviation,2)))
-                # print(resultsMatrix)
+                print("Experiment ", experimentCount, ": ")
+                print(mean)
+                print(deviation)
+                #print(resultsMatrix)
                 resultsMatrix = []
                 resultsMatrix.append([])
             experimentCount += 1
             roundCount = 1
         elif (line[0:4] == 'next'):
             roundCount += 1
-            resultsMatrix.append([])
+            if ((len(lines)-1) != index):
+                if (lines[index+1][0:8] != "Starting") :
+                    resultsMatrix.append([])
         else:
             number = re.split(r'\t+', line.rstrip('\t'))[0]
             resultsMatrix[roundCount-1].append(int(number))
+        #print(str(experimentCount), " ", str(roundCount))
+        index += 1
 
 if __name__ == "__main__":
-        main()
+    main()
