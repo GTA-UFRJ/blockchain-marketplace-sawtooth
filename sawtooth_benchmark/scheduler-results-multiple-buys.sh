@@ -4,7 +4,7 @@ rounds=$1
 file=$2
 
 #path=/scripts/results
-transaction=256
+transaction=$3
 
 cmd=()
 
@@ -43,7 +43,7 @@ sleep 10
 path="/scripts/results/serial-$(date '+%F-%H-%M-%S')"
 mkdir .$path
 
-for groups in 1 2 4 6 8;
+for groups in 1 2 4 8;
 do
 	for round in $(seq 1 $rounds); 
 	do

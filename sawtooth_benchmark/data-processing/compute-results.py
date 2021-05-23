@@ -24,9 +24,9 @@ if(sys.argv[1]=="pbft-scalab"):
 
 if(sys.argv[1]=="batch"):
     ROUNDS = 10
-    ENTITY_LIST = [1, 2, 4, 6, 8]
+    ENTITY_LIST = [1, 2, 4, 8]
     ENTITY_TYPE = "txperbatch"
-    TRANSACTIONS = 400
+    TRANSACTIONS = 128
 
 if(sys.argv[1]=="serial"):
     ROUNDS = 10

@@ -4,7 +4,7 @@ rounds=$1
 file=$2
 
 #path=/scripts/results
-transaction=300
+transaction=$3
 cmd1="/binary/v2/autavail-go-v2 register 123456 --url="http://sawtooth-rest-api-default-0:8008""
 cmd2="/binary/v2/autavail-go-v2 advert 100 123456 title description 10.0.0.1 datatype --url="http://sawtooth-rest-api-default-0:8008""
 cmd3="/binary/v2/autavail-go-v2 list --url="http://sawtooth-rest-api-default-0:8008""

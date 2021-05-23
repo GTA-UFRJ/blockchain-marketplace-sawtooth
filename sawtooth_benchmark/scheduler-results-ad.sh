@@ -67,14 +67,18 @@ do
 
 	#printf "\n ta na hora do query"
 	# consultar transações
-	#docker exec sawtooth-shell-default-0 /scripts/query-3.sh $path $transaction 1 $round &
+	docker exec sawtooth-shell-default-0 /scripts/query-3.sh $path $transaction 1 $round &
 	
 	#printf "\n mimiu again"
 	# dormir esperando o resultado
 	sleep 80
+	#curl --write-out '%{json}' http://localhost:8008/blocks -o block-saved-$round
+	#docker exec -t sawtooth-validator-default-0 cat bytes.log >> ./bytes-$round.log
+	sleep 2
 	docker logs sawtooth-validator-default-0
+	#mv ./measure-lmdb-size.py ./var-lib-sawtooth
 	
-	docker-compose -f $file down -v --remove-orphans >> /dev/null 2>&1 &
+	#docker-compose -f $file down -v --remove-orphans >> /dev/null 2>&1 &
 	#docker-compose -f docker-poet-1.yaml down -v --remove-orphans
 	sleep 30
 done
